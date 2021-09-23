@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<algo>
+	<params>
+		<param name="n" type="int" value="4"></param>
+		<param name="m" type="int" value="5"></param>
+	</params>
+
+	<!-- C[i] = C[i-1] + D[i] -->
+	<block id="0" dims="1">
+		<arg name="i" val="2..n+1"></arg>
+		<vertex condition="" type="1">
+			<in src="i-1"></in>
+		</vertex>
+	</block>
+
+	<!-- B[i][j] = B[i+1][j-1] + C[i] -->
+	<block id="1" dims="2">
+		<arg name="i" val="2..n+1"></arg>
+		<arg name="j" val="2..m+1"></arg>
+		<vertex condition="" type="1">
+			<in bsrc="0" src="i"></in>
+			<in src="i-1,j+1"></in>
+		</vertex>
+	</block>
+
+	<!-- A[i][1][1] = C[n+1] -->
+	<block id="2" dims="1">
+		<arg name="i" val="2..n+1"></arg>
+		<vertex condition="" type="1">
+			<in bsrc="0" src="n+1"></in>
+		</vertex>
+	</block>
+
+	<!-- A[i][j][k] = A[i][j-1][k-1] + A[i][j][k] -->
+	<block id="3" dims="3">
+		<arg name="i" val="2..n+1"></arg>
+		<arg name="j" val="2..m+1"></arg>
+		<arg name="k" val="1..n"></arg>
+		<vertex condition="(j == 2) and (k == 2)" type="1">
+			<in bsrc="2" src="i"></in>
+		</vertex>
+		<vertex condition="(j != 2) or (k != 2)" type="1">
+			<in src="i,j-1,k-1"></in>
+		</vertex>
+	</block>	
+</algo>
