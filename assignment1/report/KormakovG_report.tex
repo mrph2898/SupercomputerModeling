@@ -320,7 +320,31 @@ Total vertex count: 130, Critical route length: 21, Canonical LPF width: 25
 
 \section{Разметка параллельных циклов}
 Поскольку условия задания не предусматривают изменения данного фрагмента, то разметка на параллельные циклы проводится только по ресурсу параллелизма, доступному в данном фрагменте.
-Размеченный фрагмент приведён в листинге \ref{code:list3}.
+Полезными источниками для понимания теоретических возможностей (без визуального представления) распараллеливания циклов являются \cite{lobanov5},\cite{lobanov6}.
+
+Для обоснования разметки фрагмента на параллельные циклы воспользуемся определениями \textbf{вектора расстояний} $\mathbf{D}$ и \textbf{вектора направлений} $\mathbf{d}$ для многомерных циклов (см. \cite{lobanov6}).
+
+Для цикла размерности 1 (с массивами C и D):
+\begin{itemize}
+ \item $\mathbf{D} = 1$ (расстояние между стоком (sink) и источником (source))
+ \item Между операторами цикла \textit{потоковая зависимость} и (т.к. $\mathbf{D} = 1$) цикл \textit{не может быть распараллелен}
+\end{itemize}
+Для цикла размерности 2 (с массивом B):
+\begin{itemize}
+ \item $\mathbf{D} = \left(-1, 1\right)$
+ \item $\mathbf{d} = \left(''>'', ''<''\right)$ (полное совпадение с примером 6.6 \cite{lobanov6})
+ \item Между операторами \textit{антизависимость}. Распараллеливание по внутреннему циклу возможно всегда.
+ Для распараллеливания по двум одновременно или по внешнему циклу необходимо резервирование данных, что требует изменение структуры фрагмента, следовательно, не размечается.
+\end{itemize}
+
+Для цикла размерности 3 (с массивами A,B,C):
+\begin{itemize}
+ \item $\mathbf{D} = \left(0, >0, 0\right)$ \footnote{В явном виде расписать значение второй компоненты вектора расстояний затруднительно для цикла в данном виде. Однако, поскольку по i есть возможность распараллеливания, то можно утверждать о положительности, т.к. значения по второй размерности используются, как минимум, на следующей итерации по этой размерности.}
+ \item $\mathbf{d} = \left(''='', ''<'', ''=''\right)$
+ \item Между операторами существует \textit{истинная зависимость} по второй размерности. Распараллеливание по 1 и 3 размерности возможно всегда. Распараллеливание по 2 размерности невозможно.
+\end{itemize}
+
+Размеченный на основании этих выводов фрагмент приведён в листинге \ref{code:list3}.
 \lstinputlisting[language=C, style=customc, label={code:list3}]{../code/pragma_program_106.c}{}
 \section{Выводы}
 (Почти все дальнейшие рассуждения выходят за рамки обязательного задания. Поэтому для ускорения проверки можно их пропустить, но хотелось бы узнать, если будет возможность, на сколько рассуждения верны)
@@ -339,5 +363,7 @@ Total vertex count: 130, Critical route length: 21, Canonical LPF width: 25
 \bibitem{algoview} Описание системы Algoview.\\ \url{https://parallel.ru/sites/default/files/info/education/instrukciya_po_rabote_s_algoview.pdf}
 \bibitem{algolang} Описание языка Algolang. \\ \url{https://parallel.ru/sites/default/files/info/education/opisanie_yazyka_algolang.pdf}
 \bibitem{algoload} Описание системы Algoload.\\ \url{https://parallel.ru/sites/default/files/info/education/instrukciya_po_rabote_s_algoload.pdf}
+\bibitem{lobanov5} Лобанов А.И. Лекция 5. Зависимости в простых циклах и их анализ на параллельность. \\ \url{http://hpc-education.ru/files/lectures/2011/lobanov/lobanov_2011_lecture05.pdf}
+\bibitem{lobanov6} Лобанов А.И. Лекция 6. Зависимости во вложенных циклах и их анализ на параллельность. \\ \url{http://hpc-education.ru/files/lectures/2011/lobanov/lobanov_2011_lecture06.pdf}
 \end{thebibliography}
 \end{document}

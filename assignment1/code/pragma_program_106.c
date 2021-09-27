@@ -2,6 +2,7 @@ for(i = 2; i <= n+1; ++i)
     C[i] = C[i - 1] + D[i];
 
 for(i = 2; i <= n+1; ++i)
+#pragma omp parallel for
     for(j = 2; j <= m+1; ++j)
         B[i][j] = B[i + 1][j - 1];
 
