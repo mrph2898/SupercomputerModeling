@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment2/code/sum_example_mpi.c
+stdio.h
+-
+mpi.h
+-
+

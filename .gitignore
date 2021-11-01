@@ -32,3 +32,12 @@
 *.app
 
 keys/*
+*.rar
+*.idea
+*.ipynb_checkpoints*
+*.out
+*.aux
+*.synctex
+*.toc
+*.zip
+*.7z
