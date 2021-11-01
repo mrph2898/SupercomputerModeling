@@ -25,8 +25,8 @@ int main(int argc, char *argv[]){
     }
 
     int N;
-    if (epsilon < 1e-9){
-        printf("Set epsilon < 1e-9!");
+    if (epsilon < 1e-7){
+        printf("Set epsilon < 1e-7!");
         return -1;
     }
     N = roundf(1 / epsilon);
