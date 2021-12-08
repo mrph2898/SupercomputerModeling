@@ -1,0 +1,584 @@
+\documentclass[12pt, fleqn]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage{amssymb,amsmath,mathrsfs,amsthm}
+\usepackage[russian]{babel}
+\usepackage{graphicx}
+\graphicspath{ {../imgs/} }
+\usepackage[footnotesize]{caption}
+\usepackage{indentfirst}
+\usepackage{amsthm}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage[labelsep=space, singlelinecheck=on]{subcaption}
+
+\usepackage{algorithm, setspace}
+\usepackage{algpseudocode}
+\usepackage[matrix,frame,arrow]{xy}
+\usepackage[braket, qm]{qcircuit}
+\usepackage[hyphens]{url}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{textcomp}
+\usepackage{multirow}
+\usepackage{tabularx}
+    \newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\textheight=24cm
+\textwidth=16cm
+\oddsidemargin=5mm
+\evensidemargin=-5mm
+\marginparwidth=36pt
+\topmargin=-1.5cm
+\footnotesep=3ex
+%\flushbottom
+\raggedbottom
+\tolerance 3000
+\clubpenalty=10000
+\widowpenalty=10000
+\renewcommand{\baselinestretch}{1.1}
+\renewcommand{\baselinestretch}{1.5} 
+
+\addto\captionsrussian{\def\refname{Источники}}
+\theoremstyle{definition}
+\newtheorem{define}{Определение}
+\newtheorem{theorem}{Теорема}
+\newtheorem{lemma}[theorem]{Лемма}
+\newtheorem{assumption}{Утверждение}
+
+\def\vec#1{\mathchoice{\mbox{\boldmath$\displaystyle#1$}}
+{\mbox{\boldmath$\textstyle#1$}} {\mbox{\boldmath$\scriptstyle#1$}} {\mbox{\boldmath$\scriptscriptstyle#1$}}}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\definecolor{lightblue}{rgb}{0.0,0.0,0.9}
+\definecolor{cyan}{rgb}{0.0,0.6,0.6}
+\definecolor{darkred}{rgb}{0.6,0.0,0.0}
+\definecolor{purple}{rgb}{0.58,0,0.82}
+
+
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  columns=fullflexible,
+  showstringspaces=false,
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+  stepnumber=1,
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},      % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=none,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                   % show the filename of files included with \lstinputlisting;
+                                  % also try caption instead of title  
+  commentstyle=\color{gray}\upshape
+}
+
+
+\lstdefinelanguage{XML}
+{
+  morestring=[s][\color{mauve}]{"}{"},
+  morestring=[s][\color{black}]{>}{<},
+  morecomment=[s]{<?}{?>},
+  morecomment=[s][\color{dkgreen}]{<!--}{-->},
+  stringstyle=\color{black},
+  identifierstyle=\color{lightblue},
+  keywordstyle=\color{red},
+  caption={\protect\filename@parse{\lstname}\protect\filename@base\text{.}\protect\filename@ext},
+  morekeywords={xmlns,xsi,noNamespaceSchemaLocation,type,id,x,y,source,target,version,tool,transRef,roleRef,objective,eventually}% list your attributes here
+}
+
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+%   frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\linespread{0.8}\small\ttfamily,
+  keywordstyle=\bfseries\color{dkgreen},
+  commentstyle=\itshape\color{purple},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+  caption={\protect\filename@parse{\lstname}\protect\filename@base\text{.}\protect\filename@ext}
+}
+
+
+\newenvironment{packed_enum}{
+\begin{enumerate}
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+}{\end{enumerate}}
+
+\begin{document}
+\hypersetup{pageanchor=false}
+% \pagenumbering{Alph} % for correct numbering of document
+\begin{titlepage}
+\begin{center}
+    \includegraphics[width=58mm]{msu.eps}
+    
+    Московский государственный университет имени М.В.Ломоносова\\
+    Факультет вычислительной математики и кибернетики\\
+    Кафедра математических методов прогнозирования\\[25mm]
+
+    \textsf{
+        \Large\bfseries 
+        Задание по курсу <<Суперкомпьютерное моделирование и технологии>>
+        \\[5mm] 
+        Решение краевой задачи для уравнения Пуассона методом конечных разностей.
+    }\\[12mm]
+    
+    \begin{flushright}
+        \parbox{0.5\textwidth}{
+        \begin{flushright}
+            \textbf{Выполнил:}\\
+            студент 617 группы \\
+            Г.В. Кормаков
+        \end{flushright}
+        }
+    \end{flushright}
+
+    \vspace{\fill}
+    Москва, 2021
+\end{center}
+
+\end{titlepage}
+\hypersetup{pageanchor=true}
+% \pagenumbering{arabic} % for correct numbering of document
+\tableofcontents
+\newpage
+\section{Постановка задачи}
+В прямоугольнике $\Pi=\left\{(x, y): A_{1} \leqslant x \leqslant A_{2}, B_{1} \leqslant y \leqslant B_{2}\right\}$, граница $\Gamma$ которого состоит из отрезков
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+$$
+\begin{array}{ll}
+\gamma_{R}=\left\{\left(A_{2}, y\right), B_{1} \leqslant y \leqslant B_{2}\right\}, & \gamma_{L}=\left\{\left(A_{1}, y\right), B_{1} \leqslant y \leqslant B_{2}\right\} \\
+\gamma_{T}=\left\{\left(x, B_{2}\right), A_{1} \leqslant x \leqslant A_{2}\right\}, & \gamma_{B}=\left\{\left(x, B_{1}\right), A_{1} \leqslant x \leqslant A_{2}\right\}
+\end{array}
+$$
+рассматривается дифференциальное уравнение Пуассона с потенциалом
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+\begin{gather}
+-\Delta u+q(x, y) u=F(x, y) \label{eq:poisson}
+\end{gather}
+в котором оператор Лапласа
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+\begin{gather}
+\Delta u=\frac{\partial}{\partial x}\left(k(x, y) \frac{\partial u}{\partial x}\right)+\frac{\partial}{\partial y}\left(k(x, y) \frac{\partial u}{\partial y}\right) \label{eq:laplace}
+\end{gather}
+
+Для выделения единственного решения уравнение дополняется граничными условиями. На каждом отрезке границы прямоугольника $\Pi$ задается условие одним из двух способов - условиями Дирихле (1-ого типа) или условиями второго (Неймана) и третьего типа. 
+
+\textbf{Для выданного варианта 8 задания} краевые условия задаются следующими условиями: третьего типа на правой и левой границе и второго на верхней и нижней на сетке (см. раздел \ref{sec:numeric}). Общая формула условий третьего типа выглядит следующим образом:
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+\begin{gather}
+ \left(k \frac{\partial u}{\partial n}\right)(x, y)+\alpha u(x, y)=\psi(x, y),
+ \label{eq:neumann}
+\end{gather}
+где $n$ - единичная внешняя нормаль к границе прямоугольника.
+
+Краевое условие второго типа (условие Неймана) содержится в краевом условии третьего типа (случай $\alpha=0$ в \ref{eq:neumann}).
+
+Функции $F(x, y), \varphi(x, y), \psi(x, y)$, коэффициент $k(x, y)$, потенциал $q(x, y)$ и параметр $\alpha \geqslant 0$ считаются известными, функцию $u(x, y)$, удовлетворяющую уравнению \ref{eq:poisson} и граничным условиям, определенным вариантом задания 8, требуется найти.
+
+Важно отметить, что нормаль $n$ не определена в угловых точках прямоугольника. Краевое условие третьего типа будет рассматриваться лишь в тех точках границы, где нормаль существует.
+\section{Численный метод решения}\label{sec:numeric}
+\subsection{Общая схема метода конечных разностей}
+В качестве метода решения задачи Пуассона \ref{eq:poisson} с потенциалом предлагается использовать метод конечных разностей.
+
+Для этого область $\Pi$ дискретизуем сеткой $\overline{\omega}_{h}=\overline{\omega}_{1} \times \overline{\omega}_{2}$, где $\overline{\omega}_{1}$ -- разбиение сетки по оси $Ox$ с шагом $h_{1}=\frac{A_{2}-A_{1}}{M}$ и $\overline{\omega}_{2}$ -- разбиение сетки по оси $Oy$ с шагом $ h_{2}=\frac{B_{2}-B_{1}}{N}$ :
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+$$
+\overline{\omega}_{1}=\left\{x_{i}=A_{1}+i h_{1}, i=\overline{0, M}\right\}, \overline{\omega}_{2}=\left\{y_{j}=B_{1}+j h_{2}, j=\overline{0, N}\right\}
+$$
+Также примем обозначение $\omega_{h}$ для внутренних узлов сетки $\overline{\omega}_{h}$
+
+Рассматривается линейное пространство $H$ функций, заданных на сетке $\overline{\omega}_{h}$. Обозначим через $w_{ij}$ значение сеточной функции $w \in H$ в узле сетки $\left(x_{i}, y_{j}\right) \in \overline{\omega}_{h}$. Будем считать, что в пространстве $H$ задано скалярное произведение и евклидова норма
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+$$
+[u, v]=\sum_{i=0}^{M} h_{1} \sum_{j=0}^{N} h_{2} \rho_{i j} u_{i j} v_{i j}, \quad\|u\|_{E}=\sqrt{[u, u]},
+$$
+
+где $\rho_{i j}$ -- весовая функция $\rho_{i j}=\rho^{(1)}\left(x_{i}\right) \rho^{(2)}\left(y_{j}\right)$ с
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+$$
+\rho^{(1)}\left(x_{i}\right)=\left[\begin{array}{rl}
+1, & 1 \leqslant i \leqslant M-1 \\
+1 / 2, & i=0, i=M
+\end{array} \quad \rho^{(2)}\left(y_{j}\right)=\left[\begin{array}{rl}
+1, & 1 \leqslant j \leqslant N-1 \\
+1 / 2, & j=0, j=N
+\end{array}\right.\right.
+$$
+
+В методе конечных разностей дифференциальная задача математической физики заменяется конечно-разностной операторной задачей вида
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+\begin{gather}
+A w=B
+\label{eq:diff_scheme}
+\end{gather}
+где $A: H \rightarrow H$ -- оператор, действующий в пространстве сеточных функций, $B \in H-$ известная правая часть. Задача \ref{eq:diff_scheme} называется разностной схемой. Решение этой задачи считается численным решением исходной дифференциальной задачи.
+\subsection{Конкретный вид разностной схемы для варианта 8}
+Уравнение \ref{eq:poisson} приближается для всех внутренних точек $\omega_h$ сетки разностной схемой следующего вида:
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+\begin{gather*}
+ -\Delta_{h} w_{i j}+q_{i j} w_{i j}=F_{i j}, \quad i=\overline{1, M-1}, j=\overline{1, N-1},
+\end{gather*}
+в котором  $F_{i j}=F\left(x_{i}, y_{j}\right), q_{i j}=q\left(x_{i}, y_{j}\right)$ и  разностный оператор Лапласа
+\begin{gather*}
+\Delta_{h} w_{i j}= \frac{1}{h_{1}}\left(k\left(x_{i}+0.5 h_{1}, y_{j}\right) \frac{w_{(i+1) j}-w_{i j}}{h_{1}}-k\left(x_{i}-0.5 h_{1}, y_{j}\right) \frac{w_{i j}-w_{(i-1) j}}{h_{1}}\right)+\\
++\frac{1}{h_{2}}\left(k\left(x_{i}, y_{j}+0.5 h_{2}\right) \frac{w_{i (j+1)}-w_{i j}}{h_{2}}-k\left(x_{i}, y_{j}-0.5 h_{2}\right) \frac{w_{i j}-w_{i (j-1)}}{h_{2}}\right)
+\end{gather*}
+В разностном операторе Лапласа введём обозначения для правых и левых разностных производных по координатам:
+\begin{gather*}
+w_{x, i j} \equiv \frac{w_{(i+1) j} - w_{i j}}{h_{1}}, \quad w_{\overline{x}, i j} \equiv w_{x, (i-1) j}=\frac{w_{i j}-w_{(i-1) j}}{h_{1}}\\
+w_{y, i j} \equiv \frac{w_{i (j+1)}-w_{i j}}{h_{2}}, \quad w_{\overline{y}, i j} \equiv w_{y, i (j-1)} \equiv \frac{w_{i j}-w_{i (j-1)}}{h_{2}}
+\end{gather*}
+и зададим сеточные коэффициенты
+\begin{gather*}
+a_{i j} \equiv k\left(x_{i}-0.5 h_{1}, y_{j}\right), \quad b_{i j}\equiv k\left(x_{i}, y_{j}-0.5 h_{2}\right).
+\end{gather*}
+Тогда разностный оператор Лапласа равен
+\begin{gather}\nonumber 
+\Delta_{h} w_{i j}= \frac{1}{h_{1}}\left(k\left(x_{i}+0.5 h_{1}, y_{j}\right) w_{x, ij} - k\left(x_{i}-0.5 h_{1}, y_{j}\right) w_{x, (i-1)j }\right)+ \\ \nonumber 
++\frac{1}{h_{2}}\left(k\left(x_{i}, y_{j}+0.5 h_{2}\right) w_{y, i j} - k\left(x_{i}, y_{j}-0.5 h_{2}\right) w_{y, i (j-1)}\right) = \\
+= \frac{a_{(i+1) j} w_{x, ij} - a_{ij} w_{x, (i-1)j }}{h_{1}} + \frac{b_{i (j+1)} w_{y, i j} - b_{ij} w_{y, i (j-1)}}{h_{2}} = \nonumber\\ 
+= \frac{a_{(i+1) j} w_{\overline{x}, (i+1)j} - a_{ij} w_{\overline{x}, ij }}{h_{1}} + \frac{b_{i (j+1)} w_{\overline{y}, i (j+1)} - b_{ij} w_{\overline{y}, i j}}{h_{2}} \equiv \left(a w_{\overline{x}}\right)_{x, i j}+\left(b w_{\overline{y}}\right)_{y, i j} \label{eq:laplace_diff}
+\end{gather}
+Итого, получаем $(M-1)\cdot(N-1)$ уравнений во внутренних точках:
+\begin{gather}
+ -\Delta_{h} w_{i j}+q_{i j} w_{i j} =F_{i j}, \quad i=\overline{1, M-1}, j=\overline{1, N-1} 
+ \label{eq:main_int}
+\end{gather}
+Рассмотрим конкретные граничные условия, заданные в варианте 8 (см. таблицу \ref{tb:variant}).
+
+Для правой (схема \ref{eq:right})  и левой (схема \ref{eq:left}) границы ($\gamma_R, \gamma_L$ соответственно) задаются условия третьего типа. Разностный вариант (с учётом членов для соответствия порядка погрешности аппроксимации с основным уравнением \ref{eq:laplace_diff}) для них выглядит следующим образом:
+\begin{gather}
+ \frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{M j} + \left(q_{M j}+\frac{2 \alpha_{R}}{h_{1}}\right) w_{M j}-\left(b w_{\overline{y}}\right)_{y, M j}=F_{M j}+\frac{2}{h_{1}} \psi^{(R)}_{M j}, \quad j=\overline{1, N-1} \label{eq:right}\\
+-\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{1 j}+\left(q_{0 j}+\frac{2 \alpha_{L}}{h_{1}}\right) w_{0 j}-\left(b w_{\overline{y}}\right)_{y, 0 j}=F_{0 j}+\frac{2}{h_{1}} \psi^{(L)}_{0 j}, \quad j=\overline{1, N-1}\label{eq:left}
+\end{gather}
+Для верхней (схема \ref{eq:top})  и нижней (схема \ref{eq:bottom}) границы ($\gamma_T, \gamma_B$ соответственно) задаются условия второго типа (Неймана).
+\begin{gather}
+\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{i N} + q_{i N} w_{i N}-\left(a w_{\overline{x}}\right)_{x, i N}=F_{i N}+\frac{2}{h_{2}} \psi^{(T)}_{i N},\quad  i=\overline{1, M-1}  \label{eq:top}\\
+-\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{i 1}+q_{i 0} w_{i 0}-\left(a w_{\overline{x}}\right)_{x, i 0}=F_{i 0}+\frac{2}{h_{2}} \psi^{(B)}_{i 0},\quad  i=\overline{1, M-1} \label{eq:bottom}
+\end{gather}
+
+Также в угловых точках не определена нормаль, поэтому необходимо их учесть отдельными уравнениями.
+
+Для точки $P\left(A_{1}, B_{1}\right)$ прямоугольника $\Pi$
+\begin{gather}
+-\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{10} - \frac{2}{h_{2}} \left(b w_{\overline{y}}\right)_{01}+\left(q_{00}+ \frac{2\alpha_{L}}{h_{1}}\right) w_{00}= F_{00}+\left(\frac{2}{h_{1}} + \frac{2}{h_{2}}\right) \psi_{00}
+\label{eq:a1b1}
+\end{gather}
+\vspace{10pt}
+Для точки $P\left(A_{2}, B_{1}\right)$ прямоугольника $\Pi$
+\begin{gather}
+\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{M 0}-\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{M 1}+\left(q_{M 0}+\frac{2\alpha_{R}}{h_{1}}\right) w_{M 0} = F_{M 0}+\left(\frac{2}{h_{1}}+\frac{2}{h_{2}}\right) \psi_{M 0}
+\label{eq:a2b1}
+\end{gather}
+\vspace{10pt}
+Для точки $P\left(A_{2}, B_{2}\right)$ прямоугольника $\Pi$
+\begin{gather}
+\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{M N}+\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{M N}+\left(q_{M N}+\frac{2\alpha_{R}}{h_{1}}\right) w_{M N}= F_{M N}+\left(\frac{2}{h_{1}}+\frac{2}{h_{2}}\right) \psi_{M N}
+\label{eq:a2b2}
+\end{gather}
+\vspace{10pt}
+Для точки $P\left(A_{1}, B_{2}\right)$ прямоугольника $\Pi$
+\begin{gather}
+-\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{1 N}+\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{0 N}+\left(q_{0 N}+\frac{2\alpha_{L}}{h_{1}}\right) w_{0 N}= F_{0 N}+\left(\frac{2}{h_{1}}+\frac{2}{h_{2}}\right) \psi_{0 N}
+\label{eq:a1b2}
+\end{gather}
+Уточним, что обозначили за $\psi^{(T)}, \psi^{(B)}$ фунции краевых условий второго типа (для данного варианта), а  за $\psi^{(R)}, \psi^{(L)}$ -- функции краевых условий третьего типа. В угловых точках вектор нормали не определён, поэтому краевые условия равны значению функции $u(x, y)$.
+\begin{table}[!ht]
+\begin{tabular}{|c|cccc|c|c|c|}
+\hline Вариант & \multicolumn{4}{c|}{ Граничные условия } & Решение & Коэфф. & Потенциал \\
+задания & $\gamma_{R}$ & $\gamma_{L}$ & $\gamma_{T}$ & $\gamma_{B}$ & $\mathrm{u}(\mathrm{x}, \mathrm{y})$ & $k(x, y)$ & $q(x, y)$ \\
+\hline 8 & 3 тип & 3 тип & 2 тип & 2 тип & $u_{2}(x, y)$ & $k_{3}(x, y)$ & $q_{2}(x, y)$\\
+\hline
+\end{tabular}
+\caption{Условия задания}
+\label{tb:variant}
+\end{table}
+
+Запишем \textbf{финальную систему}, убедившись, что она определена.
+\begin{align*}
+  -\left(a w_{\overline{x}}\right)_{x, i j}-\left(b w_{\overline{y}}\right)_{y, i j}+q_{i j} w_{i j} &=F_{i j}, i=\overline{1, M-1}, j=\overline{1, N-1}\\
+ \frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{M j} + \left(q_{M j}+\frac{2 \alpha_{R}}{h_{1}}\right) w_{M j}-\left(b w_{\overline{y}}\right)_{y, M j}&=F_{M j}+\frac{2}{h_{1}} \psi^{(R)}_{M j}, \; j=\overline{1, N-1} \\
+-\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{1 j}+\left(q_{0 j}+\frac{2 \alpha_{L}}{h_{1}}\right) w_{0 j}-\left(b w_{\overline{y}}\right)_{y, 0 j}&=F_{0 j}+\frac{2}{h_{1}} \psi^{(L)}_{0 j}, \; j=\overline{1, N-1}\\
+\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{i N} + q_{i N} w_{i N}-\left(a w_{\overline{x}}\right)_{x, i N}&=F_{i N}+\frac{2}{h_{2}} \psi^{(T)}_{i N},\;  i=\overline{1, M-1}  \\
+-\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{i 1}+q_{i 0} w_{i 0}-\left(a w_{\overline{x}}\right)_{x, i 0}&=F_{i 0}+\frac{2}{h_{2}} \psi^{(B)}_{i 0},\;  i=\overline{1, M-1} \\
+-\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{10} - \frac{2}{h_{2}} \left(b w_{\overline{y}}\right)_{01}+\left(q_{00}+ \frac{2\alpha_{L}}{h_{1}}\right) w_{00}&= F_{00}+\left(\frac{2}{h_{1}} + \frac{2}{h_{2}}\right) \psi_{00}\\
+\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{M 0}-\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{M 1}+\left(q_{M 0}+\frac{2\alpha_{R}}{h_{1}}\right) w_{M 0} &= F_{M 0}+\left(\frac{2}{h_{1}}+\frac{2}{h_{2}}\right) \psi_{M 0}\\
+\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{M N}+\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{M N}+\left(q_{M N}+\frac{2\alpha_{R}}{h_{1}}\right) w_{M N}&= F_{M N}+\left(\frac{2}{h_{1}}+\frac{2}{h_{2}}\right) \psi_{M N}\\
+-\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{1 N}+\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{0 N}+\left(q_{0 N}+\frac{2\alpha_{L}}{h_{1}}\right) w_{0 N}&= F_{0 N}+\left(\frac{2}{h_{1}}+\frac{2}{h_{2}}\right) \psi_{0 N}
+\end{align*}
+
+Получили $(N-1)(M-1) + 2(M-1) + 2(N-1) + 4 = MN - M - N + 1 + 2M + 2N - 4 + 4 = MN + N + M + 1$ уравнений. Число неизвестных $w_{ij}$ равно $(M+1)(N+1) = MN + N + M + 1$. И система гарантирует единственность решения для данной разностной схемы.
+
+Таким образом, матрица оператора $A$ определяется коэффициентами перед неизвестными в левой части, а матрицы $B$ -- в правой.
+
+\subsection{Метод решения СЛАУ}
+Приближенное решение системы уравнений для сформулированных выше краевых задач может быть получено итерационным методом наименьших невязок. Этот метод позволяет получить последовательность сеточных функций $w^{(k)} \in H, k=1,2, \ldots$, сходящуюся по норме пространства $H$ к решению разностной схемы, т.е.
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+$$
+\left\|w-w^{(k)}\right\|_{E} \xrightarrow[k \rightarrow+\infty]{} 0
+$$
+
+Метод является одношаговым. Итерация обновления $w^{(k+1)}$ записывается в виде
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+$$
+w_{i j}^{(k+1)}=w_{i j}^{(k)}-\tau_{k+1} r_{i j}^{(k)},
+$$
+
+где невязка $r^{(k)}=A w^{(k)}-B$, итерационный параметр
+$
+\tau_{k+1}=\frac{\left[A r^{(k)}, r^{(k)}\right]}{\left\|A r^{(k)}\right\|_{E}^{2}}
+$
+
+В качестве условия остановки используем неравенство
+$
+\left\|w^{(k+1)}-w^{(k)}\right\|_{E}<\varepsilon
+$, где $\varepsilon$ - положительное число, определяющее точность итерационного метода.  Константу $\varepsilon$ для данной задачи предлагается взять равной $10^{-6}$.
+
+\subsection{Вид функций}
+В таблице \ref{tb:variant} приведены конкретные функции для данного варианта. Они задаются следующим образом
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+\begin{gather}
+ u_{2}(x, y)=\sqrt{4+x y}, \Pi=[0,4] \times[0,3] \label{eq:u_func}\\
+ k_{3}(x, y)=4+x+y \label{eq:k_func}\\
+ q_{2}(x, y)=\begin{cases}
+              x+y, & x+y \geqslant 0\\
+              0, &x+y < 0
+             \end{cases} \label{eq:q_func}
+\end{gather}
+
+\section{Нахождение $F(x, y), \psi(x, y)$}
+Поскольку для численной реализации нам предлагается сравнить приближеннное решение с истинным, то необходимо найти аналитический вид функции $F(x, y)$ и краевых условий\footnote{В случае варианта 8 необходимо найти вид только функции $\psi(x, y)$} для известного решения $u(x,y) = u_2(x, y) = \sqrt{4 + xy}, \;\Pi = [0,4]\times[0, 3]$, $k(x, y) = k_3(x, y) = 4 + x + y$ и потенциалом $q(x, y) = q_2(x, y) = \max(0, x + y)$. Для определённости, возьмём вектор нормали $\vec{n}$, направленным извне.
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+\begin{gather*}
+ \frac{\partial u}{\partial x} = \frac{y}{2\sqrt{4 + xy}}; \quad \frac{\partial u}{\partial y} = \frac{x}{2\sqrt{4 + xy}}; \\
+ \frac{\partial}{\partial x}\left(k(x, y)\frac{y}{2\sqrt{4 + xy}}\right) = \frac{y}{2\sqrt{4 + xy}} - k(x, y)\frac{y^2}{4(4 + xy)^{3/2}}\\
+ \text{Аналогично для }\frac{\partial}{\partial y}.
+\end{gather*}
+Тогда
+\abovedisplayskip=1pt
+\belowdisplayskip=2pt
+\noindent
+\begin{gather}
+ F(x, y) = -\Delta u+q(x, y) u = \nonumber \\
+ = -\frac{\partial}{\partial x}\left(k(x, y)\frac{y}{2\sqrt{4 + xy}}\right) - \frac{\partial}{\partial y}\left(k(x, y)\frac{x}{2\sqrt{4 + xy}}\right) + q(x, y)u = \nonumber \\
+ = -\frac{y}{2u(x, y)} + k(x, y)\frac{y^2}{2u^3(x, y)} - \frac{x}{2u(x, y)} + k(x, y)\frac{x^2}{4u^3(x, y)}  + q(x, y)u = \nonumber \\
+ = \frac{-2u^2 y + ky^2 - 2u^2x + kx^2 + 4qu^4}{4u^3} = \nonumber \\
+ = \frac{-2(4 + xy)(x+y) + (4 + x + y)y^2 - 2(4 + xy)x + (4 + x + y)x^2 + 4qu^4}{4(4 + xy)^{3/2}} = \nonumber \\
+ = \frac{x^3 - x^2(2y - 4 - y) -x(8 + 2y^2 - y^2) + y(-8 + 4y + y^2) + 4q(4 + xy)^2}{4(4 + xy)^{3/2}} = \nonumber \\
+ = \frac{x^3 - x^2(y - 4) - x(y^2 + 8) + y(y^2 + 4y -8) + 4\max(0, x+y)(4 + xy)^2}{4(4 + xy)^{3/2}} \label{eq:F}
+\end{gather}
+Приведём пример вычислений функции $\psi(x, y)$ для в <<общем виде>> (знак $\pm$ не значит обязательное наличие члена, в зависимости от направления, одна из компонент нормали может равняться 0).
+\begin{gather*}
+ \psi(x, y) = \left(k\frac{\partial u}{\partial \vec{n}}\right)(x, y) + \alpha u(x, y) = -k\left(\pm \frac{y^2}{4u^3} \pm \frac{x^2}{4u^3}\right) + \alpha u = \\
+ = \frac{-(4+x+y)(\pm x^2 \pm y^2) + 4\alpha(4+xy)^2}{4(4 + xy)^{3/2}}
+\end{gather*}
+Для $\gamma_R, \gamma_L$ $\alpha=1$, для $\gamma_T, \gamma_B$ $\alpha=0$. Также учтём знаки нормали к поверхности в соответствующих направлениях.
+Таким образом, в обозначениях уравнений \ref{eq:a1b1} - \ref{eq:a2b2}
+\begin{gather}
+ \psi^{(R)}(x, y) = \frac{-y^2(4+x+y) + 4(4+xy)^2}{4(4 + xy)^{3/2}}; \; \psi^{(L)}(x, y) = \frac{y^2(4+x+y) + 4(4+xy)^2}{4(4 + xy)^{3/2}}  \label{eq:psi_RL} \\
+ \psi^{(T)}(x, y) = \frac{-x^2(4+x+y)}{4(4 + xy)^{3/2}};\;
+\psi^{(B)}(x, y) = \frac{x^2(4+x+y)}{4(4 + xy)^{3/2}}\label{eq:psi_TB}
+\end{gather}
+
+\section{Описание программной реализации}
+\subsection{Формализация требований на домены}
+Перед непосредственной реализацией важно понять, как осуществлять разбиение на блоки-домены $\Pi_{ij}$, соблюдая следующие условия:
+\begin{enumerate}
+ \item отношение количества узлов по переменым $x$ и $y$ в каждом домене принадлежало диапазону $[1 / 2,2]$
+
+ \item количество узлов по переменым $x$ и $y$ любых двух доменов отличалось не более, чем на единицу.
+\end{enumerate}
+
+Условия в данной формулировке приведены в постановке задания. Уточним более корректно смысл каждого пункта\footnote{Корректность гарантирована объяснениями преподавателей на лекции, посвящённой постановке задачи}.
+Обозначим количество узлов сетки в одном домене $n_x(i)$ и $n_y(j)$ соответственно по $x$ и $y$. Количество узлов, вообще говоря, зависит от числа процессоров $p$, выделенных на задачу, в приведённых обозначениях считаем, что размер зависит от числа процессов, выделенных линейно на каждую ось (далее будет объяснён алгоритм разбиения).
+
+Первое условие утверждает, что для любого домена  его форма должна быть похожа на прямоугольную или квадратную. Формальнее,
+\begin{gather}
+  \frac{n_x(i)}{n_y(j)} \in [0.5, 2] \quad \forall \Pi_{ij} 
+ \label{eq:cond1}
+\end{gather}
+Данная конфигурация позволяет минимизировать потери во времени на перессылки.
+
+Второе условие даёт равномерность разбиения на домены. Т.е., вообще говоря, размеры доменов по оси $x$ не должны отличаться более, чем на 1, и по $y$ аналогично. Таким образом, $n_x(i), n_y(j)$, фактически должны быть константными, но из-за того, что размеры сетки могут быть не кратны числу процессоров, на граничных блоках мы получаем иные размеры. Именно на то, чтобы отличия в размерах были в этом случае минимальны и направлено ограничение 2. 
+
+Формальнее, 
+\begin{gather}
+|n_x(i_1) - n_x(i_2)| \leqslant 1, \; |n_y(j_1) - n_y(j_2)| \leqslant 1, \; \forall (i_1, j_1), (i_2, j_2)
+\label{eq:cond2}
+\end{gather}
+\subsection{Алгоритм разбиения на блоки}
+Приведём алгоритм, удовлетворяющий условиям \ref{eq:cond1},\ref{eq:cond2}.
+Обозначим за $p_x$ число процессоров, работающих в ячейках по оси $x$, и $p_y$ -- по $y$. 
+
+Для гарантированного выполнения условия \ref{eq:cond2} возьмём последовательность размеров блоков по каждой оси, отличающихся только на 1 точку. Т.е. будем чередовать по оси $x$ домены с размером $a_x$ и $a_x+1$ (по $y$ соответственно обозначим за $a_y$ и $a_y+1$).
+
+Таким образом, получаем следующие разложения
+\begin{gather}
+ \sum\limits_{i=1}^{p_x} n_x(i) = k_1 a_x + k_2 (a_x + 1) = M, \; k_1 + k_2 = p_x \Rightarrow a_x p_x + k_2 = M \label{eq:a_x}\\
+  \sum\limits_{j=1}^{p_y} n_y(j) = s_1 a_y + s_2 (a_y + 1) = N, \; s_1 + s_2 = p_y \Rightarrow a_y p_y + s_2 = N \label{eq:a_y}
+\end{gather}
+Условие \ref{eq:cond1} в новых обозначениях формулируется как
+$
+ 0.5 \leqslant \frac{a_x}{a_y} \leqslant 2
+$, т.к. в приведённой формулировке алгоритма чередоваться б\'{о}льшие блоки будут одновременно по осям.
+
+Из формул \ref{eq:a_x}, \ref{eq:a_y} видно, что необходимо поделить с остатком $M$  и $N$ на количество процессоров по осям. При этом не стоит забывать, что должно соблюдаться неравенство $p_x p_y \leqslant p$.
+
+Предлагается следующая схема: берём $p_x = 2^k$ процессоров на ось $x$ и $p_y = \lfloor\frac{p}{2^k}\rfloor$ процессоров на ось $y$.\footnote{Данная формула носит общий характер, в рамках текущего задания $p=2^n$ и можно сразу сказать, что $p_y = 2^{n-k}$} Для выполнения условия \ref{eq:cond1} логичным кажется выбирать эти числа, исходя из пропорции \ref{eq:k_frac}.
+\begin{gather}
+ \frac{2^k}{\frac{p}{2^k}} = \frac{M}{N} \Rightarrow \frac{2^{2k}}{p} = \frac{M}{N} \Rightarrow 2^{2k} = \frac{pM}{N} \Rightarrow k = \Bigl\lfloor \frac{\log_2\left(\frac{pM}{N}\right)}{2}\Bigr\rfloor \label{eq:k_frac}
+\end{gather}
+В случае $p=2^n$ выражение \ref{eq:k_frac} переходит в $k = \Bigl\lfloor \frac{n + \log_2\left(\frac{M}{N}\right)}{2}\Bigr\rfloor $.
+
+Таким образом, итоговая схема получения блоков, удовлетворяющих условиям \ref{eq:cond1} (из-за выбора $k$ согласно \ref{eq:k_frac}) и \ref{eq:cond2} (из-за выбора определённой последовательности), выглядит следующим образом:
+\begin{enumerate}
+ \item Задаём $p_x = 2^{\Bigl\lfloor \frac{\log_2\left(\frac{pM}{N}\right)}{2}\Bigr\rfloor}$, $p_y = \Bigl\lfloor\frac{p}{p_x}\Bigr\rfloor$.
+ \item Получаем $a_x = \lfloor \frac{M}{p_x}\rfloor$, $a_y = \lfloor \frac{N}{p_y}\rfloor$ и фиксируем $k_2 = M \mod p_x$, $s_2 = N \mod p_y$
+ \item Далее генерируем $k_1 = p_x - k_2$ доменов по оси $x$ с размером $a_x$ и $s_1 = p_y - s_2$ доменов по оси $y$ с размером $a_y$.
+ \item Затем начинается генерация $k_2$ доменов по оси $x$ с размером $a_x + 1$ и $s_2$ доменов по оси $y$ с размером $a_y + 1$
+\end{enumerate}
+\subsection{Реализация на MPI}
+
+\section{Результаты на системах Blue Gene/P и Polus}
+Для данной задачи выполнены подсчёты ускорения программы на системах Blue Gene/P и Polus.
+
+Под ускорением программы, запущенной на $p$ МРІ-процессах, понимается величина:
+\abovedisplayskip=-1pt
+\belowdisplayskip=-1pt
+\noindent
+\begin{gather*}
+S_{p}=\frac{T_{2}}{T_{p}}
+\end{gather*}
+где $T_{2}-$ время работы на минимальном числе МРІ-процессов, $T_{p}-$ время работы программы на $p$ МРІ-процессах.  
+
+\begin{table}[ht!]
+\begin{tabularx}{\textwidth}{|r|L|L|L|}
+\hline Число процессоров $p$ & Число точек сетки $M \times N$ & Время решения $T$ & Ускорение $S$ \\
+\hline 128 & $500 \times 1000$ & & \\
+256 & $500 \times 1000$ & &\\
+512 & $500 \times 1000$ & & \\
+\hline
+128 & $1000 \times 1000$ & & \\
+256 & $1000 \times 1000$ & & \\
+512 & $1000 \times 1000$ & & \\
+ \hline
+\end{tabularx}
+\caption{Таблица с результатами расчетов MPI версии на ПВС IBM Blue Gene/P}
+\label{tb:BG_MPI}
+\end{table}
+
+\begin{table}[ht!]
+\begin{tabularx}{\textwidth}{|r|L|L|L|}
+\hline Число процессоров $p$ & Число точек сетки $M \times N$ & Время решения $T$ & Ускорение $S$ \\
+\hline 128 & $500 \times 1000$ & &\\
+256 & $500 \times 1000$ & &\\
+512 & $500 \times 1000$ & & \\
+\hline
+128 & $1000 \times 1000$ & & \\
+256 & $1000 \times 1000$ & & \\
+512 & $1000 \times 1000$ & & \\
+ \hline
+\end{tabularx}
+\caption{Таблица с результатами расчетов гибридной MPI+OpenMP версии на ПВС IBM Blue Gene/P}
+\label{tb:BG_MPI_MP}
+\end{table}
+
+
+\begin{table}[ht!]
+\begin{tabularx}{\textwidth}{|r|L|L|L|}
+\hline Число процессоров $p$ & Число точек сетки $M \times N$ & Время решения $T$ & Ускорение $S$ \\
+\hline 4 & $500 \times 500$ & & \\
+8 & $500 \times 500$ & & \\
+16 & $500 \times 500$ & & \\
+32 & $500 \times 500$ & & \\
+\hline
+4 & $500 \times 1000$ & & \\
+8 & $500 \times 1000$ & & \\
+16 & $500 \times 1000$ & & \\
+32 & $500 \times 1000$ & & \\ \hline
+\end{tabularx}
+\caption{Таблица с результатами расчетов MPI версии на ПВС IBM Polus}
+\label{tb:P_MPI}
+\end{table}
+
+\textbf{На Blue Gene/P}
+\begin{itemize}
+    \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+ \item 
+\end{itemize}
+
+
+
+\textbf{На Polus}
+\begin{itemize}
+    \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+ \item 
+\end{itemize}
+
+
+
+\section{Заключение}
+
+\newpage
+\section{Литература}
+\begin{thebibliography}{}
+\bibitem{Bahvalov97} Бахвалов Н.С., Жидков Н.П., Кобельков Г.М. ЧИСЛЕННЫЕ МЕТОДЫ. - М.: Наука, 1987.
+ 
+\end{thebibliography}
+\newpage
+\section{Приложение 1. Код программы}\label{sec:code}
+\lstinputlisting[language=C, style=customc, label={code:list1}]{../code/neyman_pde.c}{}
+
+\end{document}
