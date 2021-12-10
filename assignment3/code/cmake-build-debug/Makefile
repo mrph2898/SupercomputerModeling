@@ -129,29 +129,29 @@ code/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/code.dir/build.make CMakeFiles/code.dir/build
 .PHONY : code/fast
 
-main.o: main.c.o
-.PHONY : main.o
+neyman_pde.o: neyman_pde.c.o
+.PHONY : neyman_pde.o
 
 # target to build an object file
-main.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/code.dir/build.make CMakeFiles/code.dir/main.c.o
-.PHONY : main.c.o
+neyman_pde.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/code.dir/build.make CMakeFiles/code.dir/neyman_pde.c.o
+.PHONY : neyman_pde.c.o
 
-main.i: main.c.i
-.PHONY : main.i
+neyman_pde.i: neyman_pde.c.i
+.PHONY : neyman_pde.i
 
 # target to preprocess a source file
-main.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/code.dir/build.make CMakeFiles/code.dir/main.c.i
-.PHONY : main.c.i
+neyman_pde.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/code.dir/build.make CMakeFiles/code.dir/neyman_pde.c.i
+.PHONY : neyman_pde.c.i
 
-main.s: main.c.s
-.PHONY : main.s
+neyman_pde.s: neyman_pde.c.s
+.PHONY : neyman_pde.s
 
 # target to generate assembly for a file
-main.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/code.dir/build.make CMakeFiles/code.dir/main.c.s
-.PHONY : main.c.s
+neyman_pde.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/code.dir/build.make CMakeFiles/code.dir/neyman_pde.c.s
+.PHONY : neyman_pde.c.s
 
 # Help Target
 help:
@@ -162,9 +162,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... code"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... neyman_pde.o"
+	@echo "... neyman_pde.i"
+	@echo "... neyman_pde.s"
 .PHONY : help
 
 

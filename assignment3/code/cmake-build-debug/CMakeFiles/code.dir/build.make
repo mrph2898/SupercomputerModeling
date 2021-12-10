@@ -66,27 +66,27 @@ include CMakeFiles/code.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/code.dir/flags.make
 
-CMakeFiles/code.dir/main.c.o: CMakeFiles/code.dir/flags.make
-CMakeFiles/code.dir/main.c.o: ../main.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/code.dir/main.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/code.dir/main.c.o -c "/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/main.c"
+CMakeFiles/code.dir/neyman_pde.c.o: CMakeFiles/code.dir/flags.make
+CMakeFiles/code.dir/neyman_pde.c.o: ../neyman_pde.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/code.dir/neyman_pde.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/code.dir/neyman_pde.c.o -c "/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/neyman_pde.c"
 
-CMakeFiles/code.dir/main.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/code.dir/main.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/main.c" > CMakeFiles/code.dir/main.c.i
+CMakeFiles/code.dir/neyman_pde.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/code.dir/neyman_pde.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/neyman_pde.c" > CMakeFiles/code.dir/neyman_pde.c.i
 
-CMakeFiles/code.dir/main.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/code.dir/main.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/main.c" -o CMakeFiles/code.dir/main.c.s
+CMakeFiles/code.dir/neyman_pde.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/code.dir/neyman_pde.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/neyman_pde.c" -o CMakeFiles/code.dir/neyman_pde.c.s
 
 # Object files for target code
 code_OBJECTS = \
-"CMakeFiles/code.dir/main.c.o"
+"CMakeFiles/code.dir/neyman_pde.c.o"
 
 # External object files for target code
 code_EXTERNAL_OBJECTS =
 
-code: CMakeFiles/code.dir/main.c.o
+code: CMakeFiles/code.dir/neyman_pde.c.o
 code: CMakeFiles/code.dir/build.make
 code: CMakeFiles/code.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable code"

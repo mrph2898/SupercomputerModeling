@@ -76,7 +76,7 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/main.c">
+		<Unit filename="/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/neyman_pde.c">
 			<Option target="code"/>
 		</Unit>
 		<Unit filename="/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/CMakeLists.txt">

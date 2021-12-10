@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/code.dir/main.c.o"
+  "CMakeFiles/code.dir/neyman_pde.c.o"
   "code"
   "code.pdb"
 )

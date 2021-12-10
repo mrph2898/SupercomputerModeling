@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/main.c" "/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/cmake-build-debug/CMakeFiles/code.dir/main.c.o"
+  "/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/neyman_pde.c" "/mnt/c/Users/Georgy/Desktop/Master CMC/3 sem/SupercomputerModeling/assignment3/code/cmake-build-debug/CMakeFiles/code.dir/neyman_pde.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

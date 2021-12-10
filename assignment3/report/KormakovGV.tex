@@ -417,15 +417,15 @@ $, где $\varepsilon$ - положительное число, определ�
 \end{gather}
 Приведём пример вычислений функции $\psi(x, y)$ для в <<общем виде>> (знак $\pm$ не значит обязательное наличие члена, в зависимости от направления, одна из компонент нормали может равняться 0).
 \begin{gather*}
- \psi(x, y) = \left(k\frac{\partial u}{\partial \vec{n}}\right)(x, y) + \alpha u(x, y) = -k\left(\pm \frac{y^2}{4u^3} \pm \frac{x^2}{4u^3}\right) + \alpha u = \\
- = \frac{-(4+x+y)(\pm x^2 \pm y^2) + 4\alpha(4+xy)^2}{4(4 + xy)^{3/2}}
+ \psi(x, y) = \left(k\frac{\partial u}{\partial \vec{n}}\right)(x, y) + \alpha u(x, y) = k\left(\pm \frac{y}{2u} \pm \frac{x}{2u}\right) + \alpha u = \\
+ = \frac{(4+x+y)(\pm x \pm y) + 2\alpha(4+xy)}{2\sqrt{4 + xy}}
 \end{gather*}
 Для $\gamma_R, \gamma_L$ $\alpha=1$, для $\gamma_T, \gamma_B$ $\alpha=0$. Также учтём знаки нормали к поверхности в соответствующих направлениях.
 Таким образом, в обозначениях уравнений \ref{eq:a1b1} - \ref{eq:a2b2}
 \begin{gather}
- \psi^{(R)}(x, y) = \frac{-y^2(4+x+y) + 4(4+xy)^2}{4(4 + xy)^{3/2}}; \; \psi^{(L)}(x, y) = \frac{y^2(4+x+y) + 4(4+xy)^2}{4(4 + xy)^{3/2}}  \label{eq:psi_RL} \\
- \psi^{(T)}(x, y) = \frac{-x^2(4+x+y)}{4(4 + xy)^{3/2}};\;
-\psi^{(B)}(x, y) = \frac{x^2(4+x+y)}{4(4 + xy)^{3/2}}\label{eq:psi_TB}
+ \psi^{(R)}(x, y) = \frac{y(4+x+y) + 2(4+xy)}{2\sqrt{4 + xy}}; \; \psi^{(L)}(x, y) = \frac{-y(4+x+y) + 2(4+xy)}{2\sqrt{4 + xy}}  \label{eq:psi_RL} \\
+ \psi^{(T)}(x, y) = \frac{x(4+x+y)}{2\sqrt{4 + xy}};\;
+\psi^{(B)}(x, y) = \frac{-x(4+x+y)}{2\sqrt{4 + xy}}\label{eq:psi_TB}
 \end{gather}
 
 \section{Описание программной реализации}
