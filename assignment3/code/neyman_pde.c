@@ -6,6 +6,27 @@
 #include <unistd.h>
 
 
+void print_matrix(int M, int N, double (*A)[N+2]){
+    printf("Matrix:\n");
+    for (int i=0; i<=M+1; i++){
+        for (int j=0; j<=N+1; j++){
+            printf("%3.2f ", A[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void print_matrix_to_file(FILE *file,
+                          int M, int N,
+                          double (*A)[N+2]){
+    for (int j=0; j<=M+1; j++){
+        for (int i=N+1; i>=0; i--){
+            fprintf(file,"%g ", A[i][j]);
+        }
+        fprintf(file, "\n");
+    }
+}
+
 double u_2(double x, double y){
     return sqrt(4 + x * y);
 }
@@ -124,85 +145,110 @@ void B_right(int M, int N, double (*B)[N+2],
        int left_border, int right_border,
        int top_border, int bottom_border){
     int i, j;
+
 # pragma omp parallel for private(i, j)
-    for(i = 1; i <= M; i++)
-        for (j = 1; j <= N; j++)
-            B[i][j] = F(x_start + i * h1, y_start + j * h2);
+    for(i = 0; i <= M + 1; i++)
+        for (j = 0; j <= N + 1; j++)
+            B[i][j] = F(x_start + (i - 1) * h1, y_start + (j - 1) * h2);
 
     if (left_border){
-        for (j = 2; j < N; j++) {
-            B[1][j] = (F(x_start + h1, y_start + j * h2) +
-                    psi_L(x_start + h1, y_start + j * h2) * 1/h1);
+        for (j = 1; j <= N; j++) {
+            B[1][j] = (F(x_start, y_start + (j - 1) * h2) +
+                    psi_L(x_start, y_start + (j - 1) * h2) * 2/h1);
 //            B[1][j] = (psi_L(x_start + h1, y_start + j * h2));
         }
-        if (top_border){
-            B[1][N] = (F(x_start, y_start + N*h2) +
-                    (psi_L(x_start + h1, y_start + (N - 1)*h2)/h1 + psi_T(x_start + 2*h1, y_start + N*h2)/h2));
-//            B[1][N] = (psi_L(x_start + h1, y_start + (N - 1)*h2) + psi_T(x_start + 2*h1, y_start + N*h2)) / 2;
-        }
-        if (bottom_border){
-            B[1][1] = (F(x_start, y_start) +
-                    (psi_L(x_start + h1, y_start + 2*h2)/h1 + psi_B(x_start + 2*h1, y_start + h2)/h2));
-//              B[1][1] = (psi_L(x_start + h1, y_start + 2*h2) + psi_B(x_start + 2*h1, y_start + h2)) / 2;
-        }
     }
-
     if (right_border){
-        for (j = 2; j < N; j++) {
-            B[M][j] = (F(x_start + M*h1, y_start + j * h2) +
-                       psi_R(x_start + M*h1, y_start + j * h2) * 1/h1);
+        for (j = 1; j <= N; j++) {
+            B[M][j] = (F(x_start + (M - 1)*h1, y_start + (j - 1) * h2) +
+                       psi_R(x_start + (M - 1)*h1, y_start + (j - 1) * h2) * 2/h1);
 //            B[M][j] = psi_R(x_start + M*h1, y_start + j * h2);
         }
-        if (top_border){
-            B[M][N] = (F(x_start + M*h1, y_start + N*h2) +
-                    (psi_R(x_start + M*h1, y_start + (N - 1)*h2)/h1 +
-                    psi_T(x_start + (M - 1)*h1, y_start + N*h2)/h2));
-//            B[M][N] = (psi_T(x_start + (M - 1)*h1, y_start + N*h2) + psi_R(x_start + M*h1, y_start + (N - 1)*h2))/h2;
-        }
-        if (bottom_border){
-            B[M][1] = (F(x_start + M*h1, y_start + h2) +
-                    (psi_R(x_start + M*h1, y_start + h2)/h1 +
-                    psi_B(x_start + (M - 1)*h1, y_start + h2)/h2));
-//            B[M][1] = (psi_B(x_start + (M - 1)*h1, y_start + h2) + psi_R(x_start + M*h1, y_start + 2*h2))/h2;
-        }
     }
-
     if (top_border){
-        for (i = 2; i < M; i++) {
-            B[i][N] = (F(x_start + i*h1, y_start + N*h2) +
-                       psi_T(x_start + i*h1, y_start + N*h2) * 1/h2);
+        for (i = 1; i <= M; i++) {
+            B[i][N] = (F(x_start + (i - 1)*h1, y_start + (N - 1)*h2) +
+                       psi_T(x_start + (i - 1)*h1, y_start + (N - 1)*h2) * 2/h2);
 //            B[i][N] = (psi_T(x_start + i*h1, y_start + N*h2));
         }
     }
 
     if (bottom_border){
-        for (i = 2; i < M; i++) {
-            B[i][1] = (F(x_start + (i - 1)*h1, y_start + h2) +
-                       psi_B(x_start + (i - 1)*h1, y_start + h2) * 1/h2);
+        for (i = 1; i <= M; i++) {
+            B[i][1] = (F(x_start + (i - 1)*h1, y_start) +
+                       psi_B(x_start + (i - 1)*h1, y_start) * 2/h2);
 //            B[i][1] = (psi_B(x_start + i*h1, y_start + h2));
         }
+    }
+    if (left_border && top_border){
+        B[1][N] = (F(x_start, y_start + (N - 1)*h2) + (2/h1 + 2/h2) *
+                   (psi_L(x_start, y_start + (N - 1)*h2) +
+                   psi_T(x_start, y_start + (N - 1)*h2))/2);
+//            B[1][N] = (psi_L(x_start + h1, y_start + (N - 1)*h2) + psi_T(x_start + 2*h1, y_start + N*h2)) / 2;
+    }
+    if (left_border && bottom_border){
+        B[1][1] =  (F(x_start, y_start) + (2/h1 + 2/h2) *
+                   (psi_L(x_start, y_start) + psi_B(x_start + h1, y_start))/2);
+
+        printf("BTTTTT%g ", B[1][1]);
+//              B[1][1] = (psi_L(x_start + h1, y_start + 2*h2) + psi_B(x_start + 2*h1, y_start + h2)) / 2;
+    }
+    if (right_border && top_border){
+        B[M][N] = (F(x_start + (M - 1)*h1, y_start + (N - 1)*h2) + (2/h1 + 2/h2) *
+                   (psi_R(x_start + (M - 1)*h1, y_start + (N - 1)*h2) +
+                    psi_T(x_start + (M - 1)*h1, y_start + (N - 1)*h2))/2);
+//            B[M][N] = (psi_T(x_start + (M - 1)*h1, y_start + N*h2) + psi_R(x_start + M*h1, y_start + (N - 1)*h2))/h2;
+    }
+    if (right_border && bottom_border){
+        B[M][1] = (F(x_start + (M - 1)*h1, y_start) + (2/h1 + 2/h2) *
+                   (psi_R(x_start + (M - 1)*h1, y_start) +
+                    psi_B(x_start + (M - 1)*h1, y_start))/2);
+//            B[M][1] = (psi_B(x_start + (M - 1)*h1, y_start + h2) + psi_R(x_start + M*h1, y_start + 2*h2))/h2;
     }
 }
 
 
-double aw_ij(int N,
+double aw_x_ij(int N,
              double (*w)[N+2],
              double x_start, double y_start,
              int i, int j,
              double h1, double h2
              ){
-    return (1/h1) * (k_3(x_start + (i + 0.5) * h1, y_start + j * h2) * (w[i + 1][j] - w[i][j]) / h1
-    - k_3(x_start + (i - 0.5) * h1, y_start + j * h2) * (w[i][j] - w[i - 1][j]) / h1);
+    return (1/h1) * (k_3(x_start + (i + 0.5 - 1) * h1,
+                         y_start + (j - 1) * h2) * (w[i + 1][j] - w[i][j]) / h1
+    - k_3(x_start + (i - 0.5 - 1) * h1, y_start + (j - 1) * h2) * (w[i][j] - w[i - 1][j]) / h1);
 }
 
-double bw_ij(int N,
+double aw_ij(int N,
+               double (*w)[N+2],
+               double x_start, double y_start,
+               int i, int j,
+               double h1, double h2
+){
+    return (k_3(x_start + (i + 0.5 - 1) * h1,
+                         y_start + (j - 1) * h2) * (w[i + 1][j] - w[i][j]) / h1);
+}
+
+double bw_y_ij(int N,
              double (*w)[N+2],
              double x_start, double y_start,
              int i, int j,
              double h1, double h2
 ){
-    return (1/h2) * (k_3(x_start + i * h1, y_start + (j + 0.5) * h2) * (w[i][j + 1] - w[i][j]) / h2
-    - k_3(x_start + i * h1, y_start + (j - 0.5) * h2) * (w[i][j] - w[i][j - 1]) / h2);
+    return (1/h2) * (k_3(x_start + (i - 1) * h1,
+                         y_start + (j + 0.5 - 1) * h2) * (w[i][j + 1] - w[i][j]) / h2
+    - k_3(x_start + (i - 1) * h1,
+          y_start + (j - 0.5 - 1) * h2) * (w[i][j] - w[i][j - 1]) / h2);
+}
+
+double bw_ij(int N,
+               double (*w)[N+2],
+               double x_start, double y_start,
+               int i, int j,
+               double h1, double h2
+){
+    return (k_3(x_start + (i - 1) * h1,
+                y_start + (j + 0.5 - 1) * h2) * (w[i][j + 1] - w[i][j]) / h2);
 }
 
 void Aw_mult(int M, int N,
@@ -217,79 +263,110 @@ void Aw_mult(int M, int N,
     int i, j;
     for (i = 0; i <= M+1; i++){
         for (j = 0; j <= N+1; j++) {
-            if (i == 0 || i == M+1 || j == 0 || j == N+1){
+            if (( i == 0) || i == M+1 || j == 0 || j == N+1){
                 A[i][j] = w[i][j];
             } else {
-                aw_x = aw_ij(N, w, x_start, y_start, i, j, h1, h2);
-                bw_y = bw_ij(N, w, x_start, y_start, i, j, h1, h2);
-                A[i][j] = -aw_x - bw_y + q_2(x_start + i * h1, y_start + j * h2) * w[i][j];
+                aw_x = aw_x_ij(N, w, x_start, y_start, i, j, h1, h2);
+                bw_y = bw_y_ij(N, w, x_start, y_start, i, j, h1, h2);
+                A[i][j] = -aw_x - bw_y + q_2(x_start + (i - 1) * h1, y_start + (j - 1) * h2) * w[i][j];
             }
         }
     }
 
-
     // Left interior border filling
     if (left_border){
-        for (j = 2; j < N; j++) {
-            aw_x = aw_ij(N, w, x_start, y_start, 1, j, h1, h2);
-            bw_y = bw_ij(N, w, x_start, y_start, 1, j, h1, h2);
-            A[1][j] = -aw_x - bw_y + (q_2(x_start + h1, y_start + j * h2) + 1/h1) * w[1][j];
+        for (j = 1; j <= N; j++) {
+//            aw_x = aw_ij(N, w, x_start, y_start, 1, j, h1, h2);
+//            bw_y = bw_ij(N, w, x_start, y_start, 1, j, h1, h2);
+//            A[1][j] = -aw_x - bw_y + (q_2(x_start, y_start + (j - 1) * h2) + 1/h1) * w[1][j];
+            aw_x = aw_ij(N, w, x_start, y_start, 1, j , h1, h2);
+            bw_y = bw_y_ij(N, w, x_start, y_start, 1, j, h1, h2);
+            A[1][j] = -2*aw_x / h1 - bw_y + (q_2(x_start,
+                                                 y_start + (j - 1) * h2) + 2/h1) * w[1][j];
 //            A[1][j] = k_3(x_start + h1, y_start + j * h2) * (w[1][j] - w[2][j])/h1;
-        }
-        if (bottom_border){
-            aw_x = aw_ij(N, w, x_start, y_start, 1, 1, h1, h2);
-            bw_y = bw_ij(N, w, x_start, y_start, 1, 1, h1, h2);
-            A[1][1] = -aw_x - bw_y + (q_2(x_start + h1, y_start + h2) + 1/h1) * w[1][1];
-//            A[1][1] = k_3(x_start + h1, y_start + h2) * (w[1][1] - w[1][2])/h2;
-        }
-        if (top_border){
-            aw_x = aw_ij(N, w, x_start, y_start, 1, N, h1, h2);
-            bw_y = bw_ij(N, w, x_start, y_start, 1, N, h1, h2);
-            A[1][N] = -aw_x - bw_y + (q_2(x_start + h1, y_start + N * h2) + 1/h1)* w[1][N];
-//            A[1][N] = k_3(x_start + h1, y_start + N * h2) * (w[1][N + 1] - w[1][N])/h2;
         }
     }
 
     // Right interior border
     if (right_border){
-        for (j = 2; j < N; j++) {
-            aw_x = aw_ij(N, w, x_start, y_start, M, j, h1, h2);
-            bw_y = bw_ij(N, w, x_start, y_start, M, j, h1, h2);
-            A[M][j] = -aw_x - bw_y + (q_2(x_start + M * h1, y_start + j * h2) + 1/h1) * w[M][j];
+        for (j = 1; j <= N; j++) {
+//            aw_x = aw_ij(N, w, x_start, y_start, M, j, h1, h2);
+//            bw_y = bw_ij(N, w, x_start, y_start, M, j, h1, h2);
+//            A[M][j] = -aw_x - bw_y + (q_2(x_start + M * h1, y_start + (j - 1) * h2) + 1/h1) * w[M][j];
 //             A[M][j] = k_3(x_start + M * h1, y_start + j * h2) * (w[M+1][j] - w[M][j])/h1;
-        }
-        if (bottom_border){
-            aw_x = aw_ij(N, w, x_start, y_start, M, 1, h1, h2);
-            bw_y = bw_ij(N, w, x_start, y_start, M, 1, h1, h2);
-            A[M][1] = -aw_x - bw_y + (q_2(x_start + M * h1, y_start + h2) + 1/h1) * w[M][1];
-//            A[M][1] = k_3(x_start + M * h1, y_start + h2) * (w[M][1] - w[M][2])/h2;
-        }
-        if (top_border) {
-            aw_x = aw_ij(N, w, x_start, y_start, M, N, h1, h2);
-            bw_y = bw_ij(N, w, x_start, y_start, M, N, h1, h2);
-            A[M][N] = -aw_x - bw_y + (q_2(x_start + M * h1, y_start + N * h2) + 1/h1) * w[M][N];
-//            A[M][N] = k_3(x_start + M * h1, y_start + N * h2) * (w[M][N + 1] - w[M][N])/h2;
+            aw_x = h1*aw_ij(N, w, x_start, y_start, M, j, h1, h2);
+            bw_y = bw_ij(N, w, x_start, y_start, M, j, h1, h2);
+            A[M][j] = 2*aw_x / h1 - bw_y + (q_2(x_start + (M - 1) * h1,
+                                                y_start + (j - 1) * h2) + 2/h1) * w[M][j];
         }
     }
 
     // Top border
     if (top_border){
-        for (i = 2; i < M; i++) {
-            aw_x = aw_ij(N, w, x_start, y_start, i, N, h1, h2);
-            bw_y = bw_ij(N, w, x_start, y_start, i, N, h1, h2);
-            A[i][N] = -aw_x - bw_y + q_2(x_start + i * h1, y_start + N * h2) * w[i][N];
+        for (i = 1; i <= M; i++) {
+//            aw_x = aw_ij(N, w, x_start, y_start, i, N, h1, h2);
+//            bw_y = bw_ij(N, w, x_start, y_start, i, N, h1, h2);
+//            A[i][N] = -aw_x - bw_y + q_2(x_start + (i - 1) * h1, y_start + N * h2) * w[i][N];
 //            A[i][N] = k_3(x_start + i * h1, y_start + N * h2) * (w[i][N + 1] - w[i][N])/h2;
+            aw_x = aw_x_ij(N, w, x_start, y_start, i, N, h1, h2);
+            bw_y = bw_ij(N, w, x_start, y_start, i, N, h1, h2);
+            A[i][N] = -aw_x + 2*bw_y / h2 + q_2(x_start + (i - 1) * h1,
+                                                y_start + (N - 1) * h2) * w[i][N];
         }
     }
 
     // Bottom border
     if (bottom_border){
-        for (i = 2; i < M; i++) {
-            aw_x = aw_ij(N, w, x_start, y_start, i, 1, h1, h2);
-            bw_y = bw_ij(N, w, x_start, y_start, i, 1, h1, h2);
-            A[i][1] = -aw_x - bw_y + q_2(x_start + i* h1, y_start + h2) * w[i][1];
+        for (i = 1; i <= M; i++) {
+//            aw_x = aw_ij(N, w, x_start, y_start, i, 1, h1, h2);
+//            bw_y = bw_ij(N, w, x_start, y_start, i, 1, h1, h2);
+//            A[i][1] = -aw_x - bw_y + q_2(x_start + (i - 1)* h1, y_start) * w[i][1];
 //            A[i][1] = k_3(x_start + i * h1, y_start + h2) * (w[i][1] - w[i][2])/h2;
+            aw_x = aw_x_ij(N, w, x_start, y_start, i, 1, h1, h2);
+            bw_y = bw_ij(N, w, x_start, y_start, i, 1, h1, h2);
+            A[i][1] = -aw_x - 2*bw_y / h2 + q_2(x_start + (i - 1)* h1, y_start) * w[i][1];
         }
+    }
+    if (left_border && bottom_border){
+//        aw_x = aw_ij(N, w, x_start, y_start, 1, 1, h1, h2);
+//        bw_y = bw_ij(N, w, x_start, y_start, 1, 1, h1, h2);
+//        A[1][1] = -aw_x - bw_y + (q_2(x_start, y_start) + 1/h1) * w[1][1];
+//            A[1][1] = k_3(x_start + h1, y_start + h2) * (w[1][1] - w[1][2])/h2;
+
+        aw_x = aw_ij(N, w, x_start, y_start, 1, 1, h1, h2);
+        bw_y = bw_ij(N, w, x_start, y_start, 1, 1, h1, h2);
+        A[1][1] = -2*aw_x / h1 - 2*bw_y / h2 + (q_2(x_start, y_start) + 2/h1) * w[1][1];
+        printf("AB%g \n", -2*aw_x / h1 - 2*bw_y / h2);
+        printf("LEFTTTTT%g ", A[1][1]);
+    }
+    if (left_border && top_border){
+//        aw_x = aw_ij(N, w, x_start, y_start, 1, N, h1, h2);
+//        bw_y = bw_ij(N, w, x_start, y_start, 1, N, h1, h2);
+//        A[1][N] = -aw_x - bw_y + (q_2(x_start, y_start + N * h2) + 1/h1)* w[1][N];
+//            A[1][N] = k_3(x_start + h1, y_start + N * h2) * (w[1][N + 1] - w[1][N])/h2;
+        aw_x = aw_ij(N, w, x_start, y_start, 1, N, h1, h2);
+        bw_y = bw_ij(N, w, x_start, y_start, 1, N, h1, h2);
+        A[1][N] = -2*aw_x / h1 + 2*bw_y / h2 + (q_2(x_start, y_start + (N - 1) * h2) + 2/h1)* w[1][N];
+    }
+
+    if (right_border && bottom_border){
+//        aw_x = aw_ij(N, w, x_start, y_start, M, 1, h1, h2);
+//        bw_y = bw_ij(N, w, x_start, y_start, M, 1, h1, h2);
+//        A[M][1] = -aw_x - bw_y + (q_2(x_start + M * h1, y_start) + 1/h1) * w[M][1];
+//            A[M][1] = k_3(x_start + M * h1, y_start + h2) * (w[M][1] - w[M][2])/h2;
+        aw_x = aw_ij(N, w, x_start, y_start, M, 1, h1, h2);
+        bw_y = bw_ij(N, w, x_start, y_start, M, 1, h1, h2);
+        A[M][1] = 2*aw_x / h1 - 2 * bw_y / h2 + (q_2(x_start + (M - 1) * h1, y_start) + 2/h1) * w[M][1];
+    }
+    if (right_border && top_border) {
+//        aw_x = aw_ij(N, w, x_start, y_start, M, N, h1, h2);
+//        bw_y = bw_ij(N, w, x_start, y_start, M, N, h1, h2);
+//        A[M][N] = -aw_x - bw_y + (q_2(x_start + M * h1, y_start + N * h2) + 1/h1) * w[M][N];
+//            A[M][N] = k_3(x_start + M * h1, y_start + N * h2) * (w[M][N + 1] - w[M][N])/h2;
+        aw_x = aw_ij(N, w, x_start, y_start, M, N, h1, h2);
+        bw_y = bw_ij(N, w, x_start, y_start, M, N, h1, h2);
+        A[M][N] = 2*aw_x / h1 + 2 * bw_y / h2 + (q_2(x_start + (M - 1) * h1,
+                                                     y_start + (N - 1) * h2) + 2/h1) * w[M][N];
     }
 }
 
@@ -323,12 +400,10 @@ void get_idx_n_idx(int *idx,
     }
     else
     {
-        if (coordinate == 0)
-        {
+        if (coordinate == 0){
             *n_idx = grid_size % process_amnt + grid_size / process_amnt;
             *idx = 0;
-        }
-        else
+        } else
         {
             *n_idx = grid_size / process_amnt;
             *idx = grid_size % process_amnt + coordinate * (grid_size / process_amnt);
@@ -346,16 +421,156 @@ void get_idx_n_idx(int *idx,
 #define MAX_ITER 100000
 
 
-void print_matrix(int M, int N, double (*A)[N+2]){
-    printf("Matrix:\n");
-    for (int i=0; i<=M+1; i++){
-        for (int j=0; j<=N+1; j++){
-            printf("%3.2f ", A[i][j]);
+void send_recv_borders(int n_x, int n_y,
+                       int process_amounts[2],
+                       double x_idx,
+                       double y_idx,
+                       int my_coords[2],
+                       int tag,
+                       double (*w)[n_y+2],
+                       double b_send[n_x],
+                       double l_send[n_y],
+                       double t_send[n_x],
+                       double r_send[n_y],
+                       double b_rec[n_x],
+                       double l_rec[n_y],
+                       double t_rec[n_x],
+                       double r_rec[n_y],
+                       int left_border, int right_border,
+                       int top_border, int bottom_border,
+                       double h1, double h2,
+                       MPI_Comm MPI_COMM_CART
+                       ){
+
+    int i, j;
+    int neighbour_coords[2];
+    int neighbour_rank;
+    MPI_Request request;
+    MPI_Status status;
+
+    // Bottom border send
+    if ((process_amounts[1] > 1) && (my_coords[1] != 0)) {
+        for (i = 0; i < n_x; i++)
+            b_send[i] = w[i+1][1];
+
+        neighbour_coords[0] = my_coords[0];
+        neighbour_coords[1] = my_coords[1] - 1;
+
+        MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
+        MPI_Isend(b_send, n_x, MPI_DOUBLE,
+                  neighbour_rank, tag + DOWN_TAG,
+                  MPI_COMM_CART, &request);
+    }
+
+    // Left border send
+    if ((process_amounts[0] > 1) && !left_border) {
+        for (j = 0; j < n_y; j++)
+            l_send[j] = w[1][j+1];
+
+        neighbour_coords[0] = my_coords[0] - 1;
+        neighbour_coords[1] = my_coords[1];
+
+        MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
+        MPI_Isend(l_send, n_y, MPI_DOUBLE,
+                  neighbour_rank, tag,
+                  MPI_COMM_CART, &request);
+    }
+
+    // Top border
+    if ((process_amounts[1] > 1) && !top_border) {
+        for (i = 0; i < n_x; i++)
+            t_send[i] = w[i+1][n_y];
+
+        neighbour_coords[0] = my_coords[0];
+        neighbour_coords[1] = my_coords[1] + 1;
+
+        MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
+        MPI_Isend(t_send, n_x, MPI_DOUBLE,
+                  neighbour_rank, tag,
+                  MPI_COMM_CART, &request);
+    }
+
+    // Right border
+    if ((process_amounts[0] > 1) && !right_border) {
+        for (j = 0; j < n_y; j++)
+            r_send[j] = w[n_x][j+1];
+
+        neighbour_coords[0] = my_coords[0] + 1;
+        neighbour_coords[1] = my_coords[1];
+
+        MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
+        MPI_Isend(r_send, n_y, MPI_DOUBLE,
+                  neighbour_rank, tag,
+                  MPI_COMM_CART, &request);
+    }
+
+    // Receive borders
+    // Bottom border
+    if ((bottom_border && (process_amounts[1] > 1)) || (process_amounts[1] == 1)) {
+        for (i = 1; i <= n_x; i++)
+            w[i][0] = u_2(A1 + (x_idx + i - 1) * h1, B1 + (y_idx - 1) * h2);
+    } else {
+        neighbour_coords[0] = my_coords[0];
+        neighbour_coords[1] = my_coords[1] - 1;
+        MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
+        MPI_Recv(b_rec, n_x, MPI_DOUBLE,
+                 neighbour_rank, tag, MPI_COMM_CART, &status);
+
+
+        for (i = 1; i <= n_x; i++)
+            w[i][0] = b_rec[i - 1];
+    }
+
+    // Left border
+    if ((left_border && (process_amounts[0] > 1)) || (process_amounts[0] == 1)) {
+        printf("OK (L)");
+        for (j = 1; j <= n_y; j++){
+            w[0][j] = u_2(A1 + (x_idx - 1) * h1, B1 + (y_idx + j - 1) * h2);
         }
-        printf("\n");
+
+    } else {
+        neighbour_coords[0] = my_coords[0] - 1;
+        neighbour_coords[1] = my_coords[1];
+
+        MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
+        MPI_Recv(l_rec, n_y, MPI_DOUBLE,
+                 neighbour_rank, tag, MPI_COMM_CART, &status);
+
+        for (j = 1; j <= n_y; j++)
+            w[0][j] = l_rec[j - 1];
+    }
+
+    // Top border
+    if ((top_border && (process_amounts[1] > 1)) || (process_amounts[1] == 1)) {
+        for (i = 1; i <= n_x; i++)
+            w[i][n_y + 1] = u_2(A1 + (x_idx + i - 1) * h1, B1 + (y_idx + n_y + 1) * h2);
+    } else {
+        neighbour_coords[0] = my_coords[0];
+        neighbour_coords[1] = my_coords[1] + 1;
+        MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
+        MPI_Recv(t_rec, n_x, MPI_DOUBLE,
+                 neighbour_rank, tag + DOWN_TAG,
+                 MPI_COMM_CART, &status);
+
+        for (i = 1; i <= n_x; i++)
+            w[i][n_y + 1] = t_rec[i - 1];
+    }
+
+    // Right border
+    if ((right_border && (process_amounts[0] > 1)) || (process_amounts[0] == 1)) {
+        for (j = 1; j <= n_y; j++)
+            w[n_x + 1][j] = u_2(A1 + (x_idx + n_x + 1)*h1, B1 + (y_idx + j - 1) * h2);
+    } else {
+        neighbour_coords[0] = my_coords[0] + 1;
+        neighbour_coords[1] = my_coords[1];
+        MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
+        MPI_Recv(r_rec, n_y, MPI_DOUBLE,
+                 neighbour_rank, tag, MPI_COMM_CART, &status);
+
+        for (j = 1; j <= n_y; j++)
+            w[n_x + 1][j] = r_rec[j - 1];
     }
 }
-
 
 int main(int argc, char *argv[]) {
     if (argc != 3) {
@@ -431,6 +646,7 @@ int main(int argc, char *argv[]) {
     double (*w_pr)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
     double (*B)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
     double tau;
+    double global_tau;
     double alpha_k, beta_k;
     double denumenator;
     double whole_denum;
@@ -451,31 +667,43 @@ int main(int argc, char *argv[]) {
     int bottom_border = 0;
 
 
-    if (my_coords[0] == 0){
+    if (my_coords[0] == 0)
         left_border = 1;
-    }
-    if (my_coords[0] == (process_amounts[0] - 1)){
+
+    if (my_coords[0] == (process_amounts[0] - 1))
         right_border = 1;
-    }
 
-    if (my_coords[1] == 0){
+    if (my_coords[1] == 0)
         bottom_border = 1;
-    }
 
-    if (my_coords[1] == (process_amounts[1] - 1)){
+    if (my_coords[1] == (process_amounts[1] - 1))
         top_border = 1;
-    }
-    printf("L%d, R%d, T%d, B%d\n", left_border, top_border, right_border, bottom_border);
+
+    printf("L%d, R%d, T%d, B%d, 'x'%d, 'y'%d\n",
+           left_border, right_border, top_border, bottom_border, my_coords[0], my_coords[1]);
+    printf("%d %d\n", x_idx, y_idx);
+
+//    FILE *debug_file;
+//    char debug_file_name[FILENAME_MAX];
+//    sprintf(debug_file_name, "L%d_R%d_T%d_B%d_x%d_y%d.txt",
+//            left_border, right_border, top_border, bottom_border, my_coords[0], my_coords[1]);
+//    debug_file = fopen(debug_file_name, "w");
 
     double (*Au)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
     double (*U)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
     for (i = 0; i <= n_x + 1; i++)
         for (j = 0; j <= n_y + 1; j++)
-            U[i][j] = u_2(A1 + (x_idx + i) * h1, B1 + (y_idx + j) * h2);
+            U[i][j] = u_2(A1 + (x_idx + i - 1) * h1, B1 + (y_idx + j - 1) * h2);
+
+//    fprintf(debug_file, "True U\n");
+    printf("Natrix U\n");
+    print_matrix(n_x, n_y, U);
 
     Aw_mult(n_x, n_y, Au, U, h1, h2, A1 + x_idx * h1, B1 + y_idx * h2,
             left_border, right_border,
             top_border,  bottom_border);
+//    fprintf(debug_file, "True Au\n");
+//    print_matrix_to_file(debug_file, n_x, n_y, Au);
 
     B_right(n_x, n_y, B,
             h1, h2,
@@ -483,7 +711,15 @@ int main(int argc, char *argv[]) {
             B1 + y_idx * h2,
             left_border, right_border,
             top_border,  bottom_border);
-
+//    fprintf(debug_file, "True B\n");
+//    print_matrix_to_file(debug_file, n_x, n_y, B);
+    printf("Matrix AU-B:\n");
+    for (int i=N+1; i>=0; i--){
+        for (int j=0; j<=M+1; j++){
+            printf("%3.2f ", Au[i][j] - B[i][j]);
+        }
+        printf("\n");
+    }
     double error_mean = 0;
     int amnt = 0;
     for (i = 1; i <= n_x; i++)
@@ -517,125 +753,20 @@ int main(int argc, char *argv[]) {
         int neighbour_coords[2];
         int tag = 0;
 
-        // Bottom border
-        if ((process_amounts[1] > 1) && (my_coords[1] != 0)) {
-            for (i = 0; i < n_x; i++)
-                b_send[i] = w[i+1][1];
+        send_recv_borders(n_x, n_y, process_amounts, x_idx, y_idx, my_coords, tag,
+                          w,
+                          b_send, l_send, t_send, r_send,
+                          b_rec, l_rec, t_rec, r_rec,
+                          left_border, right_border, top_border, bottom_border,
+                          h1, h2, MPI_COMM_CART);
 
-            neighbour_coords[0] = my_coords[0];
-            neighbour_coords[1] = my_coords[1] - 1;
-
-            MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
-            MPI_Isend(b_send, n_x, MPI_DOUBLE,
-                      neighbour_rank, tag + DOWN_TAG,
-                      MPI_COMM_CART, &request);
+        if (my_rank == 0) {
+            printf("L%d, R%d, T%d, B%d, 'x'%d, 'y'%d\n",
+                   left_border, right_border, top_border, bottom_border, my_coords[0], my_coords[1]);
+            print_matrix(n_x, n_y, w);
         }
-
-        // Left border send
-        if ((process_amounts[0] > 1) && (my_coords[0] != 0)) {
-            for (j = 0; j < n_y; j++)
-                l_send[j] = w[n_x][j+1];
-
-            neighbour_coords[0] = my_coords[0] - 1;
-            neighbour_coords[1] = my_coords[1];
-
-            MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
-            MPI_Isend(l_send, n_y, MPI_DOUBLE,
-                      neighbour_rank, tag,
-                      MPI_COMM_CART, &request);
-        }
-
-        // Top border
-        if ((process_amounts[1] > 1) && (my_coords[1] != (process_amounts[1] - 1))) {
-            for (i = 0; i < n_x; i++)
-                t_send[i] = w[i+1][n_y];
-
-            neighbour_coords[0] = my_coords[0];
-            neighbour_coords[1] = my_coords[1] + 1;
-
-            MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
-            MPI_Isend(t_send, n_x, MPI_DOUBLE,
-                      neighbour_rank, tag,
-                      MPI_COMM_CART, &request);
-        }
-
-        // Right border
-        if ((process_amounts[0] > 1) && (my_coords[0] != (process_amounts[0] - 1))) {
-            for (j = 0; j < n_y; j++)
-                r_send[j] = w[1][j+1];
-
-            neighbour_coords[0] = my_coords[0] + 1;
-            neighbour_coords[1] = my_coords[1];
-
-            MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
-            MPI_Isend(r_send, n_y, MPI_DOUBLE,
-                      neighbour_rank, tag,
-                      MPI_COMM_CART, &request);
-        }
-
-        // Receive borders
-        // Bottom border
-        if ((bottom_border && (process_amounts[1] > 1)) || (process_amounts[1] == 1)) {
-            for (i = 1; i <= n_x; i++)
-                w[i][0] = u_2(A1 + (x_idx + i) * h1, B1 + x_idx * h1);
-        } else {
-            neighbour_coords[0] = my_coords[0];
-            neighbour_coords[1] = my_coords[1] - 1;
-            MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
-            MPI_Recv(b_rec, n_x, MPI_DOUBLE,
-                     neighbour_rank, tag, MPI_COMM_CART, &status);
-
-
-            for (i = 1; i <= n_x; i++)
-                w[i][0] = b_rec[i - 1];
-        }
-
-        // Left border
-        if ((left_border && (process_amounts[0] > 1)) || (process_amounts[0] == 1)) {
-            for (j = 1; j <= n_y; j++)
-                w[0][j] = u_2(A1+ x_idx * h1, B1 + (y_idx + j) * h2);
-        } else {
-            neighbour_coords[0] = my_coords[0] - 1;
-            neighbour_coords[1] = my_coords[1];
-
-            MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
-            MPI_Recv(l_rec, n_y, MPI_DOUBLE,
-                     neighbour_rank, tag, MPI_COMM_CART, &status);
-
-            for (j = 1; j <= n_y; j++)
-                w[0][j] = l_rec[j - 1];
-        }
-
-        // Top border
-        if ((top_border && (process_amounts[1] > 1)) || (process_amounts[1] == 1)) {
-            for (i = 1; i <= n_x; i++)
-                w[i][n_y + 1] = u_2(A1 + (x_idx + i) * h1, B1 + (y_idx + n_y + 1) * h2);
-        } else {
-            neighbour_coords[0] = my_coords[0];
-            neighbour_coords[1] = my_coords[1] + 1;
-            MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
-            MPI_Recv(t_rec, n_x, MPI_DOUBLE,
-                     neighbour_rank, tag + DOWN_TAG,
-                     MPI_COMM_CART, &status);
-
-            for (i = 1; i <= n_x; i++)
-                w[i][n_y + 1] = t_rec[i - 1];
-        }
-
-        // Right border
-        if ((right_border && (process_amounts[0] > 1)) || (process_amounts[0] == 1)) {
-            for (j = 1; j <= n_y; j++)
-                w[n_x + 1][j] = u_2(A1 + (x_idx + n_x + 1)*h1, B1 + (y_idx + j) * h2);
-        } else {
-            neighbour_coords[0] = my_coords[0] + 1;
-            neighbour_coords[1] = my_coords[1];
-            MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
-            MPI_Recv(r_rec, n_y, MPI_DOUBLE,
-                     neighbour_rank, tag, MPI_COMM_CART, &status);
-
-            for (j = 1; j <= n_y; j++)
-                w[n_x + 1][j] = r_rec[j - 1];
-        }
+//        fprintf(debug_file, "W\n");
+//        print_matrix_to_file(debug_file, n_x, n_y, w);
 
         Aw_mult(n_x, n_y,
                 Aw, w,
@@ -643,75 +774,143 @@ int main(int argc, char *argv[]) {
                 A1 + x_idx * h1, B1 + y_idx * h2,
                 left_border, right_border,
                 top_border,  bottom_border);
-        if (n_iters == 1) {
-            calculate_r(n_x, n_y, r_k_1, B, Aw);
-            for (i = 0; i <= n_x + 1; i++)
-                for (j = 0; j <= n_y + 1; j++)
-                    z[i][j] = r_k_1[i][j];
-        }
+//        fprintf(debug_file, "Aw\n");
+//        print_matrix_to_file(debug_file, n_x, n_y, Aw);
 
+//        if (my_rank == 1) {
+//            print_matrix(n_x, n_y, Aw);
+//        }
+        // Make initialization for CG
+//        if (n_iters == 1) {
+//            calculate_r(n_x, n_y, r_k_1, B, Aw);
+//            if (my_rank == 1) {
+//                printf("RK1_0\n");
+//                print_matrix(n_x, n_y, r_k_1);
+//            }
+//            fprintf(debug_file, "RK1_0\n");
+//            print_matrix_to_file(debug_file, n_x, n_y, r_k_1);
+//            send_recv_borders(n_x, n_y, process_amounts, x_idx, y_idx, my_coords, tag,
+//                              r_k_1,
+//                              b_send, l_send, t_send, r_send,
+//                              b_rec, l_rec, t_rec, r_rec,
+//                              left_border, right_border, top_border, bottom_border,
+//                              h1, h2, MPI_COMM_CART);
+//            for (i = 0; i <= n_x + 1; i++)
+//                for (j = 0; j <= n_y + 1; j++)
+//                    z[i][j] = r_k_1[i][j];
+//        }
+
+//        if (my_rank == 1) {
+//            printf("RK1\n");
+//            print_matrix(n_x, n_y, r_k_1);
+//            printf("z\n");
+//            print_matrix(n_x, n_y, z);
+//        }
+//        fprintf(debug_file, "RK1\n");
+//        print_matrix_to_file(debug_file, n_x, n_y, r_k_1);
+//        fprintf(debug_file, "Z\n");
+//        print_matrix_to_file(debug_file, n_x, n_y, z);
+
+//        Aw_mult(n_x, n_y,
+//                Ar, r_k_1,
+//                h1, h2,
+//                A1 + x_idx * h1, B1 + y_idx * h2,
+//                left_border, right_border,
+//                top_border,  bottom_border);
+//        if (my_rank == 1) {
+//            printf("Ar\n");
+//            print_matrix(n_x, n_y, Ar);
+//        }
+//        fprintf(debug_file, "Ar\n");
+//        print_matrix_to_file(debug_file, n_x, n_y, Ar);
+        calculate_r(n_x, n_y, r_k, Aw, B);
+        printf("RK\n");
+        print_matrix(n_x, n_y, r_k);
         Aw_mult(n_x, n_y,
-                Ar, r_k_1,
+                Ar, r_k,
                 h1, h2,
                 A1 + x_idx * h1, B1 + y_idx * h2,
                 left_border, right_border,
                 top_border,  bottom_border);
-
-//        tau = dot_product(n_x, n_y, Ar, r_k_1, h1, h2,
-//                          left_border, right_border,
-//                          top_border, bottom_border
-//                          ) / dot_product(n_x, n_y, Ar, Ar, h1, h2,
-//                                          left_border, right_border,
-//                                          top_border, bottom_border);
-        Aw_mult(n_x, n_y,
-                Az, z,
-                h1, h2,
-                A1 + x_idx * h1, B1 + y_idx * h2,
-                left_border, right_border,
-                top_border,  bottom_border);
-        alpha_k  = dot_product(n_x, n_y, r_k_1, r_k_1, h1, h2,
-                               left_border, right_border,
-                               top_border, bottom_border
-                               );
-        denumenator = dot_product(n_x, n_y, Az, z, h1, h2,
+        tau = dot_product(n_x, n_y, Ar, r_k, h1, h2,
+                          left_border, right_border,
+                          top_border, bottom_border
+                          );
+        denumenator = dot_product(n_x, n_y, Ar, Ar, h1, h2,
                                   left_border, right_border,
                                   top_border, bottom_border);
-
-        MPI_Allreduce(&alpha_k,  &global_alpha, 1,
+        MPI_Allreduce(&tau,  &global_tau, 1,
                       MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
         MPI_Allreduce(&denumenator,  &whole_denum, 1,
                       MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-        global_alpha = global_alpha / whole_denum;
+        global_tau = global_tau / whole_denum;
 
-
+//        Aw_mult(n_x, n_y,
+//                Az, z,
+//                h1, h2,
+//                A1 + x_idx * h1, B1 + y_idx * h2,
+//                left_border, right_border,
+//                top_border,  bottom_border);
+//        if (my_rank == 1) {
+//            printf("Az\n");
+//            print_matrix(n_x, n_y, Az);
+//        }
+//        fprintf(debug_file, "Az\n");
+//        print_matrix_to_file(debug_file, n_x, n_y, Az);
+//        alpha_k  = dot_product(n_x, n_y, r_k_1, r_k_1, h1, h2,
+//                               left_border, right_border,
+//                               top_border, bottom_border);
+//        denumenator = dot_product(n_x, n_y, Az, z, h1, h2,
+//                                  left_border, right_border,
+//                                  top_border, bottom_border);
+//
+//        MPI_Allreduce(&alpha_k,  &global_alpha, 1,
+//                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+//        MPI_Allreduce(&denumenator,  &whole_denum, 1,
+//                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+//        global_alpha = global_alpha / whole_denum;
 
 //        printf("Tau = %f\n", tau);
+//# pragma omp parallel for private(i, j)
+//        for (i = 1; i <= n_x; i++)
+//            for (j = 1; j <= n_y; j++) {
+//                w[i][j] = w[i][j] + global_alpha * z[i][j];
+//                r_k[i][j] = r_k_1[i][j] - global_alpha * Az[i][j];
+//            }
 # pragma omp parallel for private(i, j)
         for (i = 1; i <= n_x; i++)
             for (j = 1; j <= n_y; j++) {
-                w[i][j] = w[i][j] + global_alpha * z[i][j];
-                r_k[i][j] = r_k_1[i][j] - global_alpha * Az[i][j];
+                w[i][j] = w[i][j] - global_tau * r_k[i][j];
             }
-        beta_k = dot_product(n_x, n_y, r_k, r_k, h1, h2,
-                             left_border, right_border,
-                             top_border, bottom_border
-                             );
-        denumenator = dot_product(n_x, n_y, r_k_1, r_k_1, h1, h2,
-                                  left_border, right_border,
-                                  top_border, bottom_border);
+        printf("WWWW\n");
+        print_matrix(n_x, n_y, w);
 
-        MPI_Allreduce(&beta_k,  &global_beta, 1,
-                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-        MPI_Allreduce(&denumenator,  &whole_denum, 1,
-                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-        global_beta = global_beta / whole_denum;
+//        send_recv_borders(n_x, n_y, process_amounts, x_idx, y_idx, my_coords, tag,
+//                          r_k,
+//                          b_send, l_send, t_send, r_send,
+//                          b_rec, l_rec, t_rec, r_rec,
+//                          left_border, right_border, top_border, bottom_border,
+//                          h1, h2, MPI_COMM_CART);
+//        beta_k = dot_product(n_x, n_y, r_k, r_k, h1, h2,
+//                             left_border, right_border,
+//                             top_border, bottom_border
+//                             );
+//        denumenator = dot_product(n_x, n_y, r_k_1, r_k_1, h1, h2,
+//                                  left_border, right_border,
+//                                  top_border, bottom_border);
+//
+//        MPI_Allreduce(&beta_k,  &global_beta, 1,
+//                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+//        MPI_Allreduce(&denumenator,  &whole_denum, 1,
+//                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+//        global_beta = global_beta / whole_denum;
 
-# pragma omp parallel for private(i, j)
-        for (i = 1; i <= n_x; i++)
-            for (j = 1; j <= n_y; j++) {
-                z[i][j] = r_k[i][j] + global_beta * z[i][j];
-                r_k_1[i][j] = r_k[i][j];
-            }
+//# pragma omp parallel for private(i, j)
+//        for (i = 1; i <= n_x; i++)
+//            for (j = 1; j <= n_y; j++) {
+//                z[i][j] = r_k[i][j] + global_beta * z[i][j];
+//                r_k_1[i][j] = r_k[i][j];
+//            }
 
         calculate_r(n_x, n_y, w_w_pr, w, w_pr);
         block_eps = norm(n_x, n_y, w_w_pr, h1, h2,
@@ -732,6 +931,9 @@ int main(int argc, char *argv[]) {
 
         MPI_Allreduce(&block_eps, &cur_eps, 1,
                       MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+//        if (my_rank ==0)
+//        MPI_Abort(MPI_COMM_WORLD, 0);
     }
 
     // Waiting for all processes
@@ -757,6 +959,7 @@ int main(int argc, char *argv[]) {
     char true_u_file_name[FILENAME_MAX];
     sprintf(true_u_file_name, "true.u_%d_%d.csv", my_coords[0], my_coords[1]);
 
+//    fclose(debug_file);
     dim0 = fopen("dim0.csv", "w");
     dim1 = fopen("dim1.csv", "w");
     grid = fopen("grid.csv", "w");
@@ -783,6 +986,11 @@ int main(int argc, char *argv[]) {
         }
         fprintf(grid, "%d %d", process_amounts[1], process_amounts[0]);
     }
+    fclose(dim0);
+    fclose(dim1);
+    fclose(grid);
+    fclose(u_file);
+    fclose(true_u_file);
 
     free(Au);
     free(U);
