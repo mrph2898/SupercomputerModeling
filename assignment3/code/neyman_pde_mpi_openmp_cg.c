@@ -95,9 +95,10 @@ double dot_product(int M, int N,
                    ){
     double answer = 0.;
     double rho, r1, r2;
-
-    for (int i=1; i <= M; i++){
-        for (int j=1; j <= N; j++){
+    int i, j;
+# pragma omp parallel for private(i, j)
+    for (i=1; i <= M; i++){
+        for (j=1; j <= N; j++){
             r1 = rho_1(i, M, left_border, right_border);
             r2 = rho_2(j, N, bottom_border, top_border);
             rho = r1 * r2;
@@ -379,12 +380,12 @@ void send_recv_borders(int n_x, int n_y,
                        int top_border, int bottom_border,
                        double h1, double h2,
                        MPI_Comm MPI_COMM_CART
-                       ){
+){
 
     int i, j;
     int neighbour_coords[2];
     int neighbour_rank;
-    MPI_Request request;
+    MPI_Request request[4] = {MPI_REQUEST_NULL, MPI_REQUEST_NULL, MPI_REQUEST_NULL, MPI_REQUEST_NULL};
     MPI_Status status;
 
     // Bottom border send
@@ -398,7 +399,7 @@ void send_recv_borders(int n_x, int n_y,
         MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
         MPI_Isend(b_send, n_x, MPI_DOUBLE,
                   neighbour_rank, tag + DOWN_TAG,
-                  MPI_COMM_CART, &request);
+                  MPI_COMM_CART, &request[0]);
     }
 
     // Left border send
@@ -412,7 +413,7 @@ void send_recv_borders(int n_x, int n_y,
         MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
         MPI_Isend(l_send, n_y, MPI_DOUBLE,
                   neighbour_rank, tag,
-                  MPI_COMM_CART, &request);
+                  MPI_COMM_CART, &request[1]);
     }
 
     // Top border
@@ -426,7 +427,7 @@ void send_recv_borders(int n_x, int n_y,
         MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
         MPI_Isend(t_send, n_x, MPI_DOUBLE,
                   neighbour_rank, tag,
-                  MPI_COMM_CART, &request);
+                  MPI_COMM_CART, &request[2]);
     }
 
     // Right border
@@ -440,7 +441,7 @@ void send_recv_borders(int n_x, int n_y,
         MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
         MPI_Isend(r_send, n_y, MPI_DOUBLE,
                   neighbour_rank, tag,
-                  MPI_COMM_CART, &request);
+                  MPI_COMM_CART, &request[3]);
     }
 
     // Receive borders
@@ -510,6 +511,9 @@ void send_recv_borders(int n_x, int n_y,
 # pragma omp parallel for private(j)
         for (j = 1; j <= n_y; j++)
             w[n_x + 1][j] = r_rec[j - 1];
+    }
+    for (int i = 0; i < 4; i++) {
+        MPI_Wait(&request[i], &status);
     }
 }
 

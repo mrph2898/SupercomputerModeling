@@ -374,7 +374,7 @@ void send_recv_borders(int n_x, int n_y,
     int i, j;
     int neighbour_coords[2];
     int neighbour_rank;
-    MPI_Request request;
+    MPI_Request request[4] = {MPI_REQUEST_NULL, MPI_REQUEST_NULL, MPI_REQUEST_NULL, MPI_REQUEST_NULL};
     MPI_Status status;
 
     // Bottom border send
@@ -388,7 +388,7 @@ void send_recv_borders(int n_x, int n_y,
         MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
         MPI_Isend(b_send, n_x, MPI_DOUBLE,
                   neighbour_rank, tag + DOWN_TAG,
-                  MPI_COMM_CART, &request);
+                  MPI_COMM_CART, &request[0]);
     }
 
     // Left border send
@@ -402,7 +402,7 @@ void send_recv_borders(int n_x, int n_y,
         MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
         MPI_Isend(l_send, n_y, MPI_DOUBLE,
                   neighbour_rank, tag,
-                  MPI_COMM_CART, &request);
+                  MPI_COMM_CART, &request[1]);
     }
 
     // Top border
@@ -416,7 +416,7 @@ void send_recv_borders(int n_x, int n_y,
         MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
         MPI_Isend(t_send, n_x, MPI_DOUBLE,
                   neighbour_rank, tag,
-                  MPI_COMM_CART, &request);
+                  MPI_COMM_CART, &request[2]);
     }
 
     // Right border
@@ -430,7 +430,7 @@ void send_recv_borders(int n_x, int n_y,
         MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
         MPI_Isend(r_send, n_y, MPI_DOUBLE,
                   neighbour_rank, tag,
-                  MPI_COMM_CART, &request);
+                  MPI_COMM_CART, &request[3]);
     }
 
     // Receive borders
@@ -496,6 +496,10 @@ void send_recv_borders(int n_x, int n_y,
 
         for (j = 1; j <= n_y; j++)
             w[n_x + 1][j] = r_rec[j - 1];
+    }
+
+    for (int i = 0; i < 4; i++) {
+        MPI_Wait(&request[i], &status);
     }
 }
 
