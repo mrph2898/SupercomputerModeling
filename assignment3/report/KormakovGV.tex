@@ -337,14 +337,14 @@ a_{i j} \equiv k\left(x_{i}-0.5 h_{1}, y_{j}\right), \quad b_{i j}\equiv k\left(
 Запишем \textbf{финальную систему}, убедившись, что она определена.
 \begin{align*}
   -\left(a w_{\overline{x}}\right)_{x, i j}-\left(b w_{\overline{y}}\right)_{y, i j}+q_{i j} w_{i j} &=F_{i j}, i=\overline{1, M-1}, j=\overline{1, N-1}\\
- \frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{M j} + \left(q_{M j}+\frac{2 \alpha_{R}}{h_{1}}\right) w_{M j}-\left(b w_{\overline{y}}\right)_{y, M j}&=F_{M j}+\frac{2}{h_{1}} \psi^{(R)}_{M j}, \; j=\overline{1, N-1} \\
--\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{1 j}+\left(q_{0 j}+\frac{2 \alpha_{L}}{h_{1}}\right) w_{0 j}-\left(b w_{\overline{y}}\right)_{y, 0 j}&=F_{0 j}+\frac{2}{h_{1}} \psi^{(L)}_{0 j}, \; j=\overline{1, N-1}\\
+ \frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{M j} + \left(q_{M j}+\frac{2 }{h_{1}}\right) w_{M j}-\left(b w_{\overline{y}}\right)_{y, M j}&=F_{M j}+\frac{2}{h_{1}} \psi^{(R)}_{M j}, \; j=\overline{1, N-1} \\
+-\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{1 j}+\left(q_{0 j}+\frac{2}{h_{1}}\right) w_{0 j}-\left(b w_{\overline{y}}\right)_{y, 0 j}&=F_{0 j}+\frac{2}{h_{1}} \psi^{(L)}_{0 j}, \; j=\overline{1, N-1}\\
 \frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{i N} + q_{i N} w_{i N}-\left(a w_{\overline{x}}\right)_{x, i N}&=F_{i N}+\frac{2}{h_{2}} \psi^{(T)}_{i N},\;  i=\overline{1, M-1}  \\
 -\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{i 1}+q_{i 0} w_{i 0}-\left(a w_{\overline{x}}\right)_{x, i 0}&=F_{i 0}+\frac{2}{h_{2}} \psi^{(B)}_{i 0},\;  i=\overline{1, M-1} \\
--\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{10} - \frac{2}{h_{2}} \left(b w_{\overline{y}}\right)_{01}+\left(q_{00}+ \frac{2\alpha_{L}}{h_{1}}\right) w_{00}&= F_{00}+\left(\frac{2}{h_{1}} + \frac{2}{h_{2}}\right) \psi_{00}\\
-\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{M 0}-\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{M 1}+\left(q_{M 0}+\frac{2\alpha_{R}}{h_{1}}\right) w_{M 0} &= F_{M 0}+\left(\frac{2}{h_{1}}+\frac{2}{h_{2}}\right) \psi_{M 0}\\
-\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{M N}+\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{M N}+\left(q_{M N}+\frac{2\alpha_{R}}{h_{1}}\right) w_{M N}&= F_{M N}+\left(\frac{2}{h_{1}}+\frac{2}{h_{2}}\right) \psi_{M N}\\
--\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{1 N}+\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{0 N}+\left(q_{0 N}+\frac{2\alpha_{L}}{h_{1}}\right) w_{0 N}&= F_{0 N}+\left(\frac{2}{h_{1}}+\frac{2}{h_{2}}\right) \psi_{0 N}
+-\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{10} - \frac{2}{h_{2}} \left(b w_{\overline{y}}\right)_{01}+\left(q_{00}+ \frac{2}{h_{1}}\right) w_{00}&= F_{00}+\left(\frac{2}{h_{1}} + \frac{2}{h_{2}}\right) \frac{\psi^{(L)}_{00} + \psi^{(B)}_{00}}{2}\\
+\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{M 0}-\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{M 1}+\left(q_{M 0}+\frac{2}{h_{1}}\right) w_{M 0} &= F_{M 0}+\left(\frac{2}{h_{1}}+\frac{2}{h_{2}}\right) \frac{\psi^{(R)}_{M 0} + \psi^{(B)}_{M 0}}{2}\\
+\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{M N}+\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{M N}+\left(q_{M N}+\frac{2}{h_{1}}\right) w_{M N}&= F_{M N}+\left(\frac{2}{h_{1}}+\frac{2}{h_{2}}\right) \frac{\psi^{(R)}_{M N} + \psi^{(T)}_{M N}}{2}\\
+-\frac{2}{h_{1}}\left(a w_{\overline{x}}\right)_{1 N}+\frac{2}{h_{2}}\left(b w_{\overline{y}}\right)_{0 N}+\left(q_{0 N}+\frac{2}{h_{1}}\right) w_{0 N}&= F_{0 N}+\left(\frac{2}{h_{1}}+\frac{2}{h_{2}}\right) \frac{\psi^{(L)}_{0 N} + \psi^{(T)}_{0 N}}{2}
 \end{align*}
 
 Получили $(N-1)(M-1) + 2(M-1) + 2(N-1) + 4 = MN - M - N + 1 + 2M + 2N - 4 + 4 = MN + N + M + 1$ уравнений. Число неизвестных $w_{ij}$ равно $(M+1)(N+1) = MN + N + M + 1$. И система гарантирует единственность решения для данной разностной схемы.

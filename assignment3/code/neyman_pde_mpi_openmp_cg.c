@@ -50,24 +50,6 @@ double F(double x, double y){
     (4 * pow((4 + x*y), 1.5)));
 }
 
-//double psi_R(double x, double y){
-//    return (-y*y*(4 + x + y) + 4*pow(4 + x*y, 2)) / (4*pow(4 + x*y, 1.5));
-//}
-//
-//
-//double psi_L(double x, double y){
-//    return (y*y*(4 + x + y) + 4*pow(4 + x*y, 2)) / (4*pow(4 + x*y, 1.5));
-//}
-//
-//
-//double psi_T(double x, double y){
-//    return (-x*x*(4 + x + y)) / (4*pow(4 + x*y, 1.5));
-//}
-//
-//
-//double psi_B(double x, double y){
-//    return -psi_T(x, y);
-//}
 double psi_R(double x, double y){
     return (y*(4 + x + y) + 2*(4 + x*y)) / (2*sqrt(4 + x*y));
 }
@@ -149,56 +131,52 @@ void B_right(int M, int N, double (*B)[N+2],
             B[i][j] = F(x_start + (i - 1) * h1, y_start + (j - 1) * h2);
 
     if (left_border){
+# pragma omp parallel for private(j)
         for (j = 1; j <= N; j++) {
             B[1][j] = (F(x_start, y_start + (j - 1) * h2) +
                     psi_L(x_start, y_start + (j - 1) * h2) * 2/h1);
-//            B[1][j] = (psi_L(x_start + h1, y_start + j * h2));
         }
     }
     if (right_border){
+# pragma omp parallel for private(j)
         for (j = 1; j <= N; j++) {
             B[M][j] = (F(x_start + (M - 1)*h1, y_start + (j - 1) * h2) +
                        psi_R(x_start + (M - 1)*h1, y_start + (j - 1) * h2) * 2/h1);
-//            B[M][j] = psi_R(x_start + M*h1, y_start + j * h2);
         }
     }
     if (top_border){
+# pragma omp parallel for private(i)
         for (i = 1; i <= M; i++) {
             B[i][N] = (F(x_start + (i - 1)*h1, y_start + (N - 1)*h2) +
                        psi_T(x_start + (i - 1)*h1, y_start + (N - 1)*h2) * 2/h2);
-//            B[i][N] = (psi_T(x_start + i*h1, y_start + N*h2));
         }
     }
 
     if (bottom_border){
+# pragma omp parallel for private(i)
         for (i = 1; i <= M; i++) {
             B[i][1] = (F(x_start + (i - 1)*h1, y_start) +
                        psi_B(x_start + (i - 1)*h1, y_start) * 2/h2);
-//            B[i][1] = (psi_B(x_start + i*h1, y_start + h2));
         }
     }
     if (left_border && top_border){
         B[1][N] = (F(x_start, y_start + (N - 1)*h2) +
                 (2/h1 + 2/h2) * (psi_L(x_start, y_start + (N - 1)*h2) +
                                  psi_T(x_start, y_start + (N - 1)*h2)) / 2);
-//            B[1][N] = (psi_L(x_start + h1, y_start + (N - 1)*h2) + psi_T(x_start + 2*h1, y_start + N*h2)) / 2;
     }
     if (left_border && bottom_border){
         B[1][1] =  (F(x_start, y_start)
                 + (2/h1 + 2/h2) * (psi_L(x_start, y_start) + psi_B(x_start, y_start)) / 2);
-//              B[1][1] = (psi_L(x_start + h1, y_start + 2*h2) + psi_B(x_start + 2*h1, y_start + h2)) / 2;
     }
     if (right_border && top_border){
         B[M][N] = (F(x_start + (M - 1)*h1, y_start + (N - 1)*h2) +
                 (2/h1 + 2/h2) * (psi_R(x_start + (M - 1)*h1, y_start + (N - 1)*h2) +
                                  psi_T(x_start + (M - 1)*h1, y_start + (N - 1)*h2)) / 2);
-//            B[M][N] = (psi_T(x_start + (M - 1)*h1, y_start + N*h2) + psi_R(x_start + M*h1, y_start + (N - 1)*h2))/h2;
     }
     if (right_border && bottom_border){
         B[M][1] = (F(x_start + (M - 1)*h1, y_start) +
                 (2/h1 + 2/h2) * (psi_R(x_start + (M - 1)*h1, y_start) +
                                  psi_B(x_start + (M - 1)*h1, y_start)) / 2);
-//            B[M][1] = (psi_B(x_start + (M - 1)*h1, y_start + h2) + psi_R(x_start + M*h1, y_start + 2*h2))/h2;
     }
 }
 
@@ -251,6 +229,7 @@ void Aw_mult(int M, int N,
 {
     double aw_x, bw_y;
     int i, j;
+# pragma omp parallel for private(i, j)
     for (i = 0; i <= M+1; i++){
         for (j = 0; j <= N+1; j++) {
             if (( i == 0) || i == M+1 || j == 0 || j == N+1){
@@ -266,25 +245,19 @@ void Aw_mult(int M, int N,
 
     // Left interior border filling
     if (left_border){
+# pragma omp parallel for private(j)
         for (j = 1; j <= N; j++) {
-//            aw_x = aw_ij(N, w, x_start, y_start, 1, j, h1, h2);
-//            bw_y = bw_ij(N, w, x_start, y_start, 1, j, h1, h2);
-//            A[1][j] = -aw_x - bw_y + (q_2(x_start, y_start + (j - 1) * h2) + 1/h1) * w[1][j];
             aw_x = aw_ij(N, w, x_start, y_start, 2, j , h1, h2);
             bw_y = bw_y_ij(N, w, x_start, y_start, 1, j, h1, h2);
             A[1][j] = -2*aw_x / h1 - bw_y + (q_2(x_start,
                                                  y_start + (j - 1) * h2) + 2/h1) * w[1][j];
-//            A[1][j] = k_3(x_start + h1, y_start + j * h2) * (w[1][j] - w[2][j])/h1;
         }
     }
 
     // Right interior border
     if (right_border){
+# pragma omp parallel for private(j)
         for (j = 1; j <= N; j++) {
-//            aw_x = aw_ij(N, w, x_start, y_start, M, j, h1, h2);
-//            bw_y = bw_ij(N, w, x_start, y_start, M, j, h1, h2);
-//            A[M][j] = -aw_x - bw_y + (q_2(x_start + M * h1, y_start + (j - 1) * h2) + 1/h1) * w[M][j];
-//             A[M][j] = k_3(x_start + M * h1, y_start + j * h2) * (w[M+1][j] - w[M][j])/h1;
             aw_x = aw_ij(N, w, x_start, y_start, M, j, h1, h2);
             bw_y = bw_y_ij(N, w, x_start, y_start, M, j, h1, h2);
             A[M][j] = 2*aw_x / h1 - bw_y + (q_2(x_start + (M - 1) * h1,
@@ -294,11 +267,8 @@ void Aw_mult(int M, int N,
 
     // Top border
     if (top_border){
+# pragma omp parallel for private(i)
         for (i = 1; i <= M; i++) {
-//            aw_x = aw_ij(N, w, x_start, y_start, i, N, h1, h2);
-//            bw_y = bw_ij(N, w, x_start, y_start, i, N, h1, h2);
-//            A[i][N] = -aw_x - bw_y + q_2(x_start + (i - 1) * h1, y_start + N * h2) * w[i][N];
-//            A[i][N] = k_3(x_start + i * h1, y_start + N * h2) * (w[i][N + 1] - w[i][N])/h2;
             aw_x = aw_x_ij(N, w, x_start, y_start, i, N, h1, h2);
             bw_y = bw_ij(N, w, x_start, y_start, i, N, h1, h2);
             A[i][N] = -aw_x + 2*bw_y / h2 + q_2(x_start + (i - 1) * h1,
@@ -308,50 +278,30 @@ void Aw_mult(int M, int N,
 
     // Bottom border
     if (bottom_border){
+# pragma omp parallel for private(i)
         for (i = 1; i <= M; i++) {
-//            aw_x = aw_ij(N, w, x_start, y_start, i, 1, h1, h2);
-//            bw_y = bw_ij(N, w, x_start, y_start, i, 1, h1, h2);
-//            A[i][1] = -aw_x - bw_y + q_2(x_start + (i - 1)* h1, y_start) * w[i][1];
-//            A[i][1] = k_3(x_start + i * h1, y_start + h2) * (w[i][1] - w[i][2])/h2;
             aw_x = aw_x_ij(N, w, x_start, y_start, i, 1, h1, h2);
             bw_y = bw_ij(N, w, x_start, y_start, i, 2, h1, h2);
             A[i][1] = -aw_x - 2*bw_y / h2 + q_2(x_start + (i - 1)* h1, y_start) * w[i][1];
         }
     }
     if (left_border && bottom_border){
-//        aw_x = aw_ij(N, w, x_start, y_start, 1, 1, h1, h2);
-//        bw_y = bw_ij(N, w, x_start, y_start, 1, 1, h1, h2);
-//        A[1][1] = -aw_x - bw_y + (q_2(x_start, y_start) + 1/h1) * w[1][1];
-//            A[1][1] = k_3(x_start + h1, y_start + h2) * (w[1][1] - w[1][2])/h2;
-
         aw_x = aw_ij(N, w, x_start, y_start, 2, 1, h1, h2);
         bw_y = bw_ij(N, w, x_start, y_start, 1, 2, h1, h2);
         A[1][1] = -2*aw_x / h1 - 2*bw_y / h2 + (q_2(x_start, y_start) + 2/h1) * w[1][1];
     }
     if (left_border && top_border){
-//        aw_x = aw_ij(N, w, x_start, y_start, 1, N, h1, h2);
-//        bw_y = bw_ij(N, w, x_start, y_start, 1, N, h1, h2);
-//        A[1][N] = -aw_x - bw_y + (q_2(x_start, y_start + N * h2) + 1/h1)* w[1][N];
-//            A[1][N] = k_3(x_start + h1, y_start + N * h2) * (w[1][N + 1] - w[1][N])/h2;
         aw_x = aw_ij(N, w, x_start, y_start, 2, N, h1, h2);
         bw_y = bw_ij(N, w, x_start, y_start, 1, N, h1, h2);
         A[1][N] = -2*aw_x / h1 + 2*bw_y / h2 + (q_2(x_start, y_start + (N - 1) * h2) + 2/h1)* w[1][N];
     }
 
     if (right_border && bottom_border){
-//        aw_x = aw_ij(N, w, x_start, y_start, M, 1, h1, h2);
-//        bw_y = bw_ij(N, w, x_start, y_start, M, 1, h1, h2);
-//        A[M][1] = -aw_x - bw_y + (q_2(x_start + M * h1, y_start) + 1/h1) * w[M][1];
-//            A[M][1] = k_3(x_start + M * h1, y_start + h2) * (w[M][1] - w[M][2])/h2;
         aw_x = aw_ij(N, w, x_start, y_start, M, 1, h1, h2);
         bw_y = bw_ij(N, w, x_start, y_start, M, 2, h1, h2);
         A[M][1] = 2*aw_x / h1 - 2 * bw_y / h2 + (q_2(x_start + (M - 1) * h1, y_start) + 2/h1) * w[M][1];
     }
     if (right_border && top_border) {
-//        aw_x = aw_ij(N, w, x_start, y_start, M, N, h1, h2);
-//        bw_y = bw_ij(N, w, x_start, y_start, M, N, h1, h2);
-//        A[M][N] = -aw_x - bw_y + (q_2(x_start + M * h1, y_start + N * h2) + 1/h1) * w[M][N];
-//            A[M][N] = k_3(x_start + M * h1, y_start + N * h2) * (w[M][N + 1] - w[M][N])/h2;
         aw_x = aw_ij(N, w, x_start, y_start, M, N, h1, h2);
         bw_y = bw_ij(N, w, x_start, y_start, M, N, h1, h2);
         A[M][N] = 2*aw_x / h1 + 2 * bw_y / h2 + (q_2(x_start + (M - 1) * h1,
@@ -366,7 +316,7 @@ void calculate_r(int M, int N,
                  double (*B)[N+2]
                  ){
     int i, j;
-    //# pragma omp parallel for private(i, j)
+# pragma omp parallel for private(i, j)
     for(i = 0; i <= M + 1; i++) {
         for (j = 0; j <= N + 1; j++) {
             if(i == 0 || i == M+1 || j == 0 || j == N+1)
@@ -496,6 +446,7 @@ void send_recv_borders(int n_x, int n_y,
     // Receive borders
     // Bottom border
     if ((bottom_border && (process_amounts[1] > 1)) || (process_amounts[1] == 1)) {
+# pragma omp parallel for private(i)
         for (i = 1; i <= n_x; i++)
             w[i][0] = u_2(A1 + (x_idx + i - 1) * h1, B1 + (y_idx - 1) * h2);
     } else {
@@ -504,13 +455,14 @@ void send_recv_borders(int n_x, int n_y,
         MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
         MPI_Recv(b_rec, n_x, MPI_DOUBLE,
                  neighbour_rank, tag, MPI_COMM_CART, &status);
-
+# pragma omp parallel for private(i)
         for (i = 1; i <= n_x; i++)
             w[i][0] = b_rec[i - 1];
     }
 
     // Left border
     if ((left_border && (process_amounts[0] > 1)) || (process_amounts[0] == 1)) {
+# pragma omp parallel for private(j)
         for (j = 1; j <= n_y; j++){
             w[0][j] = u_2(A1 + (x_idx - 1) * h1, B1 + (y_idx + j - 1) * h2);
         }
@@ -522,13 +474,14 @@ void send_recv_borders(int n_x, int n_y,
         MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
         MPI_Recv(l_rec, n_y, MPI_DOUBLE,
                  neighbour_rank, tag, MPI_COMM_CART, &status);
-
+# pragma omp parallel for private(j)
         for (j = 1; j <= n_y; j++)
             w[0][j] = l_rec[j - 1];
     }
 
     // Top border
     if ((top_border && (process_amounts[1] > 1)) || (process_amounts[1] == 1)) {
+# pragma omp parallel for private(i)
         for (i = 1; i <= n_x; i++)
             w[i][n_y + 1] = u_2(A1 + (x_idx + i - 1) * h1, B1 + (y_idx + n_y) * h2);
     } else {
@@ -538,13 +491,14 @@ void send_recv_borders(int n_x, int n_y,
         MPI_Recv(t_rec, n_x, MPI_DOUBLE,
                  neighbour_rank, tag + DOWN_TAG,
                  MPI_COMM_CART, &status);
-
+# pragma omp parallel for private(i)
         for (i = 1; i <= n_x; i++)
             w[i][n_y + 1] = t_rec[i - 1];
     }
 
     // Right border
     if ((right_border && (process_amounts[0] > 1)) || (process_amounts[0] == 1)) {
+# pragma omp parallel for private(j)
         for (j = 1; j <= n_y; j++)
             w[n_x + 1][j] = u_2(A1 + (x_idx + n_x)*h1, B1 + (y_idx + j - 1) * h2);
     } else {
@@ -553,7 +507,7 @@ void send_recv_borders(int n_x, int n_y,
         MPI_Cart_rank(MPI_COMM_CART, neighbour_coords, &neighbour_rank);
         MPI_Recv(r_rec, n_y, MPI_DOUBLE,
                  neighbour_rank, tag, MPI_COMM_CART, &status);
-
+# pragma omp parallel for private(j)
         for (j = 1; j <= n_y; j++)
             w[n_x + 1][j] = r_rec[j - 1];
     }
@@ -634,18 +588,18 @@ int main(int argc, char *argv[]) {
     double (*B)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
     double tau = 0;
     double global_tau = 0;
-//    double alpha_k, beta_k;
+    double alpha_k, beta_k;
     double denumenator;
     double whole_denum;
     double global_alpha, global_beta;
     double eps_local, eps_r;
 
     double (*Aw)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
-//    double (*r_k_1)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
+    double (*r_k_1)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
     double (*r_k)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
     double (*Ar)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
-//    double (*z)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
-//    double (*Az)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
+    double (*z)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
+    double (*Az)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
     double (*w_w_pr)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
 
     int left_border = 0;
@@ -670,28 +624,16 @@ int main(int argc, char *argv[]) {
            left_border, right_border, top_border, bottom_border, my_coords[0], my_coords[1]);
     printf("%d %d\n", x_idx, y_idx);
 
-//    FILE *debug_file;
-//    char debug_file_name[FILENAME_MAX];
-//    sprintf(debug_file_name, "L%d_R%d_T%d_B%d_x%d_y%d.txt",
-//            left_border, right_border, top_border, bottom_border, my_coords[0], my_coords[1]);
-//    debug_file = fopen(debug_file_name, "w");
-
     double (*Au)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
     double (*U)[n_y + 2] = malloc(sizeof(double[n_x + 2][n_y + 2]));
     for (i = 0; i <= n_x + 1; i++)
         for (j = 0; j <= n_y + 1; j++)
             U[i][j] = u_2(A1 + (x_idx + i - 1) * h1, B1 + (y_idx + j - 1) * h2);
 
-//    fprintf(debug_file, "True U\n");
-//    printf("Natrix U\n");
-//    print_matrix(n_x, n_y, U);
-
     Aw_mult(n_x, n_y, Au, U, h1, h2,
             A1 + x_idx * h1, B1 + y_idx * h2,
             left_border, right_border,
             top_border,  bottom_border);
-//    fprintf(debug_file, "True Au\n");
-//    print_matrix_to_file(debug_file, n_x, n_y, Au);
 
     B_right(n_x, n_y, B,
             h1, h2,
@@ -699,16 +641,14 @@ int main(int argc, char *argv[]) {
             B1 + y_idx * h2,
             left_border, right_border,
             top_border,  bottom_border);
-//    fprintf(debug_file, "True B\n");
-//    print_matrix_to_file(debug_file, n_x, n_y, B);
+    double norm_b, all_norm_b;
+    norm_b = dot_product(n_x, n_y, B, B, h1, h2,
+                         left_border, right_border,
+                         top_border, bottom_border);
+    MPI_Allreduce(&norm_b,  &all_norm_b, 1,
+                  MPI_DOUBLE, MPI_SUM, MPI_COMM_CART);
+    all_norm_b = sqrt(all_norm_b);
 
-    printf("Matrix AU-B:\n");
-    for (int i=N+1; i>=0; i--){
-        for (int j=0; j<=M+1; j++){
-            printf("%3.2f ", Au[i][j] - B[i][j]);
-        }
-        printf("\n");
-    }
     double error_mean = 0;
     int amnt = 0;
     for (i = 1; i <= n_x; i++)
@@ -725,10 +665,9 @@ int main(int argc, char *argv[]) {
 
     int tag = 0;
     while ((cur_eps > EPS_REL) && (n_iters < MAX_ITER)) {
-//        print_matrix(M, N, w);
         n_iters++;
 
-        // # pragma omp parallel for private(i, j)
+# pragma omp parallel for private(i, j)
         for (i = 0; i <= n_x + 1; i++) {
             for (j = 0; j <= n_y + 1; j++) {
                 if (i == 0 || j == 0 || i == n_x + 1 || j == n_y + 1) {
@@ -748,194 +687,107 @@ int main(int argc, char *argv[]) {
                           top_border, bottom_border,
                           h1, h2, MPI_COMM_CART);
 
-//        if (my_rank == 0) {
-//            printf("L%d, R%d, T%d, B%d, 'x'%d, 'y'%d\n",
-//                   left_border, right_border, top_border, bottom_border,
-//                   my_coords[0], my_coords[1]);
-//            print_matrix(n_x, n_y, w);
-//        }
-//        fprintf(debug_file, "W\n");
-//        print_matrix_to_file(debug_file, n_x, n_y, w);
-
         Aw_mult(n_x, n_y,
                 Aw, w,
                 h1, h2,
                 A1 + x_idx * h1, B1 + y_idx * h2,
                 left_border, right_border,
                 top_border,  bottom_border);
-//        fprintf(debug_file, "Aw\n");
-//        print_matrix_to_file(debug_file, n_x, n_y, Aw);
 
-//        if (my_rank == 1) {
-//            print_matrix(n_x, n_y, Aw);
-//        }
-        // Make initialization for CG
-//        if (n_iters == 1) {
-//            calculate_r(n_x, n_y, r_k_1, B, Aw);
-//            if (my_rank == 1) {
-//                printf("RK1_0\n");
-//                print_matrix(n_x, n_y, r_k_1);
-//            }
-//            fprintf(debug_file, "RK1_0\n");
-//            print_matrix_to_file(debug_file, n_x, n_y, r_k_1);
-//            send_recv_borders(n_x, n_y, process_amounts, x_idx, y_idx, my_coords, tag,
-//                              r_k_1,
-//                              b_send, l_send, t_send, r_send,
-//                              b_rec, l_rec, t_rec, r_rec,
-//                              left_border, right_border, top_border, bottom_border,
-//                              h1, h2, MPI_COMM_CART);
-//            for (i = 0; i <= n_x + 1; i++)
-//                for (j = 0; j <= n_y + 1; j++)
-//                    z[i][j] = r_k_1[i][j];
-//        }
+//         Make initialization for CG
+        if (n_iters == 1) {
+            calculate_r(n_x, n_y, r_k_1, B, Aw);
 
-//        if (my_rank == 1) {
-//            printf("RK1\n");
-//            print_matrix(n_x, n_y, r_k_1);
-//            printf("z\n");
-//            print_matrix(n_x, n_y, z);
-//        }
-//        fprintf(debug_file, "RK1\n");
-//        print_matrix_to_file(debug_file, n_x, n_y, r_k_1);
-//        fprintf(debug_file, "Z\n");
-//        print_matrix_to_file(debug_file, n_x, n_y, z);
-
-//        Aw_mult(n_x, n_y,
-//                Ar, r_k_1,
-//                h1, h2,
-//                A1 + x_idx * h1, B1 + y_idx * h2,
-//                left_border, right_border,
-//                top_border,  bottom_border);
-//        if (my_rank == 1) {
-//            printf("Ar\n");
-//            print_matrix(n_x, n_y, Ar);
-//        }
-//        fprintf(debug_file, "Ar\n");
-//        print_matrix_to_file(debug_file, n_x, n_y, Ar);
-        calculate_r(n_x, n_y, r_k, Aw, B);
-
-//        printf("RK\n");
-//        print_matrix(n_x, n_y, r_k);
-        send_recv_borders(n_x, n_y, process_amounts,
-                          x_idx, y_idx, my_coords, tag,
-                          r_k,
-                          b_send, l_send, t_send, r_send,
-                          b_rec, l_rec, t_rec, r_rec,
-                          left_border, right_border,
-                          top_border, bottom_border,
-                          h1, h2, MPI_COMM_CART);
-//        printf("RK1\n");
-//        print_matrix(n_x, n_y, r_k);
+            send_recv_borders(n_x, n_y, process_amounts, x_idx, y_idx, my_coords, tag,
+                              r_k_1,
+                              b_send, l_send, t_send, r_send,
+                              b_rec, l_rec, t_rec, r_rec,
+                              left_border, right_border, top_border, bottom_border,
+                              h1, h2, MPI_COMM_CART);
+            for (i = 0; i <= n_x + 1; i++)
+                for (j = 0; j <= n_y + 1; j++)
+                    z[i][j] = r_k_1[i][j];
+        }
 
         Aw_mult(n_x, n_y,
-                Ar, r_k,
+                Ar, r_k_1,
                 h1, h2,
                 A1 + x_idx * h1, B1 + y_idx * h2,
                 left_border, right_border,
                 top_border,  bottom_border);
 
-        tau = dot_product(n_x, n_y, Ar, r_k, h1, h2,
-                          left_border, right_border,
-                          top_border, bottom_border
-                          );
-        denumenator = dot_product(n_x, n_y, Ar, Ar, h1, h2,
+
+        Aw_mult(n_x, n_y,
+                Az, z,
+                h1, h2,
+                A1 + x_idx * h1, B1 + y_idx * h2,
+                left_border, right_border,
+                top_border,  bottom_border);
+
+        alpha_k  = dot_product(n_x, n_y, r_k_1, r_k_1, h1, h2,
+                               left_border, right_border,
+                               top_border, bottom_border);
+        denumenator = dot_product(n_x, n_y, Az, z, h1, h2,
                                   left_border, right_border,
                                   top_border, bottom_border);
-        MPI_Allreduce(&tau,  &global_tau, 1,
-                      MPI_DOUBLE, MPI_SUM, MPI_COMM_CART);
+
+        MPI_Allreduce(&alpha_k,  &global_alpha, 1,
+                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
         MPI_Allreduce(&denumenator,  &whole_denum, 1,
-                      MPI_DOUBLE, MPI_SUM, MPI_COMM_CART);
-        global_tau = global_tau / whole_denum;
+                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        global_alpha = global_alpha / whole_denum;
 
-//        Aw_mult(n_x, n_y,
-//                Az, z,
-//                h1, h2,
-//                A1 + x_idx * h1, B1 + y_idx * h2,
-//                left_border, right_border,
-//                top_border,  bottom_border);
-//        if (my_rank == 1) {
-//            printf("Az\n");
-//            print_matrix(n_x, n_y, Az);
-//        }
-//        fprintf(debug_file, "Az\n");
-//        print_matrix_to_file(debug_file, n_x, n_y, Az);
-//        alpha_k  = dot_product(n_x, n_y, r_k_1, r_k_1, h1, h2,
-//                               left_border, right_border,
-//                               top_border, bottom_border);
-//        denumenator = dot_product(n_x, n_y, Az, z, h1, h2,
-//                                  left_border, right_border,
-//                                  top_border, bottom_border);
-//
-//        MPI_Allreduce(&alpha_k,  &global_alpha, 1,
-//                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-//        MPI_Allreduce(&denumenator,  &whole_denum, 1,
-//                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-//        global_alpha = global_alpha / whole_denum;
-
-//        printf("Tau = %f\n", tau);
-//# pragma omp parallel for private(i, j)
-//        for (i = 1; i <= n_x; i++)
-//            for (j = 1; j <= n_y; j++) {
-//                w[i][j] = w[i][j] + global_alpha * z[i][j];
-//                r_k[i][j] = r_k_1[i][j] - global_alpha * Az[i][j];
-//            }
+# pragma omp parallel for private(i, j)
+        for (i = 1; i <= n_x; i++)
+            for (j = 1; j <= n_y; j++) {
+                w[i][j] = w[i][j] + global_alpha * z[i][j];
+                r_k[i][j] = r_k_1[i][j] - global_alpha * Az[i][j];
+            }
 # pragma omp parallel for private(i, j)
         for (i = 1; i <= n_x; i++)
             for (j = 1; j <= n_y; j++) {
                 w[i][j] = w[i][j] - global_tau * r_k[i][j];
             }
-//        printf("WWWW\n");
-//        print_matrix(n_x, n_y, w);
 
-//        send_recv_borders(n_x, n_y, process_amounts, x_idx, y_idx, my_coords, tag,
-//                          r_k,
-//                          b_send, l_send, t_send, r_send,
-//                          b_rec, l_rec, t_rec, r_rec,
-//                          left_border, right_border, top_border, bottom_border,
-//                          h1, h2, MPI_COMM_CART);
-//        beta_k = dot_product(n_x, n_y, r_k, r_k, h1, h2,
-//                             left_border, right_border,
-//                             top_border, bottom_border
-//                             );
-//        denumenator = dot_product(n_x, n_y, r_k_1, r_k_1, h1, h2,
-//                                  left_border, right_border,
-//                                  top_border, bottom_border);
-//
-//        MPI_Allreduce(&beta_k,  &global_beta, 1,
-//                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-//        MPI_Allreduce(&denumenator,  &whole_denum, 1,
-//                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-//        global_beta = global_beta / whole_denum;
+        send_recv_borders(n_x, n_y, process_amounts, x_idx, y_idx, my_coords, tag,
+                          r_k,
+                          b_send, l_send, t_send, r_send,
+                          b_rec, l_rec, t_rec, r_rec,
+                          left_border, right_border, top_border, bottom_border,
+                          h1, h2, MPI_COMM_CART);
+        beta_k = dot_product(n_x, n_y, r_k, r_k, h1, h2,
+                             left_border, right_border,
+                             top_border, bottom_border
+                             );
+        denumenator = dot_product(n_x, n_y, r_k_1, r_k_1, h1, h2,
+                                  left_border, right_border,
+                                  top_border, bottom_border);
 
-//# pragma omp parallel for private(i, j)
-//        for (i = 1; i <= n_x; i++)
-//            for (j = 1; j <= n_y; j++) {
-//                z[i][j] = r_k[i][j] + global_beta * z[i][j];
-//                r_k_1[i][j] = r_k[i][j];
-//            }
+        MPI_Allreduce(&beta_k,  &global_beta, 1,
+                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(&denumenator,  &whole_denum, 1,
+                      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        global_beta = global_beta / whole_denum;
 
-        calculate_r(n_x, n_y, w_w_pr, w, w_pr);
-        block_eps = norm(n_x, n_y, w_w_pr, h1, h2,
-                         left_border, right_border,
-                         top_border, bottom_border);
-        printf("TAU 1= %g\n",dot_product(n_x, n_y, Ar, r_k, h1, h2,
-                          left_border, right_border,
-                          top_border, bottom_border) );
-        printf("TAU 2= %g\n", dot_product(n_x, n_y, Ar, Ar, h1, h2,
-                          left_border, right_border,
-                          top_border, bottom_border));
-        printf("NORM AR= %g\n", norm(n_x, n_y, Ar, h1, h2,
-                          left_border, right_border,
-                          top_border, bottom_border));
-        printf("NORM R= %g\n", norm(n_x, n_y, r_k, h1, h2,
-                          left_border, right_border,
-                          top_border, bottom_border));
+# pragma omp parallel for private(i, j)
+        for (i = 1; i <= n_x; i++)
+            for (j = 1; j <= n_y; j++) {
+                z[i][j] = r_k[i][j] + global_beta * z[i][j];
+                r_k_1[i][j] = r_k[i][j];
+            }
+        send_recv_borders(n_x, n_y, process_amounts, x_idx, y_idx, my_coords, tag,
+                          z,
+                          b_send, l_send, t_send, r_send,
+                          b_rec, l_rec, t_rec, r_rec,
+                          left_border, right_border, top_border, bottom_border,
+                          h1, h2, MPI_COMM_CART);
 
+        block_eps = dot_product(n_x, n_y, r_k_1, r_k_1, h1, h2,
+                                left_border, right_border,
+                                top_border, bottom_border);
         MPI_Allreduce(&block_eps, &cur_eps, 1,
                       MPI_DOUBLE, MPI_SUM, MPI_COMM_CART);
-
-//        if (my_rank ==0)
-//        MPI_Abort(MPI_COMM_WORLD, 0);
+        cur_eps = sqrt(cur_eps) / all_norm_b;
     }
 
     // Waiting for all processes
@@ -961,7 +813,6 @@ int main(int argc, char *argv[]) {
     char true_u_file_name[FILENAME_MAX];
     sprintf(true_u_file_name, "true.u_%d_%d.csv", my_coords[0], my_coords[1]);
 
-//    fclose(debug_file);
     dim0 = fopen("dim0.csv", "w");
     dim1 = fopen("dim1.csv", "w");
     grid = fopen("grid.csv", "w");
