@@ -1,0 +1,2 @@
+cuda_neuman_pde: blocks_functions.h
+	nvcc -gencode arch=compute_52,code=sm_52 -gencode arch=compute_60,code=sm_60 -I./ -I. -I/opt/ibm/spectrum_mpi/include -L/tmp/lepera/yeti_10010004_RTM2/ibm-smpi/ompibase/dependencies/lib -L/opt/ibm/spectrum_mpi/lib -lmpiprofilesupport -lmpi_ibm -lm -lopen-rte -lopen-pal -ldl -lnsl -lutil blocks_functions.cu main.cu -o cuda_neuman_pde

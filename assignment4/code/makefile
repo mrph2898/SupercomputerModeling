@@ -1,0 +1,2 @@
+cuda_neuman_pde: main_huge.cu
+	nvcc -gencode arch=compute_52,code=sm_52 -gencode arch=compute_60,code=sm_60 -I./ -I. -I/opt/ibm/spectrum_mpi/include -L/tmp/lepera/yeti_10010004_RTM2/ibm-smpi/ompibase/dependencies/lib -L/opt/ibm/spectrum_mpi/lib -lmpiprofilesupport -lmpi_ibm -lm main_huge.cu -o cuda_neuman_pde
